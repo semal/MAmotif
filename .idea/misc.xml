@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<project version="4">
-  <component name="ExportToHTMLSettings">
-    <option name="printScope" value="4" />
-    <option name="OPEN_IN_BROWSER" value="true" />
-    <option name="OUTPUT_DIRECTORY" value="F:\MAmotif_src\exportToHTML" />
-  </component>
-  <component name="ProjectRootManager" version="2" project-jdk-name="Python 2.7.7 (D:\Anaconda2.0\python.exe)" project-jdk-type="Python SDK" />
-</project>
