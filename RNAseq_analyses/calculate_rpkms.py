@@ -9,17 +9,15 @@ def output_rpkm(cell_folder, refgenes_file):
     """
     if cell_folder.endswith(os.sep):
         cell_folder = cell_folder[:-1]
-
     from joblib import Parallel, delayed
-    fipath_list = \
-        [os.sep.join([cell_folder, fi]) for fi in os.listdir(cell_folder) if fi.endswith('.bed')]
+    fipath_list = [os.sep.join([cell_folder, fi]) for fi in os.listdir(cell_folder) if fi.endswith('.bed')]
     Parallel(n_jobs=4)(delayed(run1)(fi, refgenes_file) for fi in fipath_list)
+    # [run(fi, refgene_file) for fi in fipath_list]
     new_fipath_list = [fipath[:-4] + '_rpkm.txt' for fipath in fipath_list]
+    # print new_fipath_list
 
     result = open(cell_folder + '_rpkms.txt', 'w')
-    header = \
-        '\t'.join(['Transcipt-ID', 'Gene-Symbol'] +
-                  [fi for fi in os.listdir(cell_folder) if fi.endswith('.bed')]) + '\n'
+    header = '\t'.join([''] + [fi for fi in os.listdir(cell_folder) if fi.endswith('.bed')]) + '\n'
     result.write(header)
     rpkms = [[] for _ in range(len(fipath_list))]
     refgenes = []
@@ -27,19 +25,18 @@ def output_rpkm(cell_folder, refgenes_file):
         fi = open(fipath)
         fi.readline()  # skip the header line
         for line in fi:
-            rpkms[i].append(line.split()[-1])  # rpkm value
-            if i == 0:  # get transcript id and gene symbol form a file
-                refgenes.append('\t'.join(line.split('\t')[0:2]))
+            rpkms[i].append(line.split()[1])
+            if i == 0:
+                refgenes.append(line.split()[0])
         fi.close()
     # print rpkms
     for i, refgene in enumerate(refgenes):
         line = '\t'.join([refgene] + [rpkm[i] for rpkm in rpkms]) + '\n'
         result.write(line)
     result.close()
-
     # delete the temp files
-    # for fipath in new_fipath_list:
-    #     os.remove(fipath)
+    for fipath in new_fipath_list:
+        os.remove(fipath)
 
 
 if __name__ == '__main__':

@@ -30,16 +30,17 @@ class FeatureMotif(Feature):
     def is_exist_in_sequence(self, peak):
         if not self.__is_grouped:
             self.group()
-
         for pk_motif in self.__group_motifscan_result[peak.chrm]:
             if peak == pk_motif:
                 if pk_motif.target_number > 0:
                     return True
                 elif pk_motif.target_number == 0:
                     return False
-        peak.prints()
-        print '@warning: this peak not exist in motifscan result!'
-        self.mismatch += 1
+        else:
+            #peak.prints()
+            #print 'this peak not exist in motifscan result!'
+            self.mismatch += 1
+            pass
 
     def group(self):
         for motifscan in self.__motifscan_result:
@@ -189,8 +190,8 @@ class Classifier(object):
             else:
                 self.feature_no.append(pk)
             i += 1
-            if i % 5000 == 0:
-                print '@info: Already classified %d peaks ...' % i
+            if i % 1000 == 0:
+                # print 'Already classified %d peaks ...' % i
                 pass
         self._is_classified = True
 
@@ -202,8 +203,7 @@ class Classifier(object):
 
 class MAnormPeaksClassifier(Classifier):
     """
-    class used for classifying MAnorm peaks into yes and no sets,
-    and test result of classified result
+    class used for classifying MAnorm peaks into yes and no sets, and test result of classified result
     """
 
     def __init__(self, pk_set, feature):
@@ -213,8 +213,7 @@ class MAnormPeaksClassifier(Classifier):
     def ttest_feature_classified_peaks(self):
         if not self._is_classified:
             self.classify_by_feature()
-        mvalue_yes, mvalue_no = \
-            [pk.mvalue for pk in self.feature_yes], [pk.mvalue for pk in self.feature_no]
+        mvalue_yes, mvalue_no = [pk.mvalue for pk in self.feature_yes], [pk.mvalue for pk in self.feature_no]
         try:
             t_statistic, two_tailed_pvalue = stats.ttest_ind(mvalue_yes, mvalue_no, equal_var=False)
             if t_statistic < 0:

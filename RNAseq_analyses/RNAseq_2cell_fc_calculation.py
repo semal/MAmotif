@@ -79,10 +79,8 @@ def calculate_fc(cell1_folder, cell2_folder, refgene_file):
 
 if __name__ == '__main__':
     opt_parser = OptionParser()
-    opt_parser.add_option('--cell1', dest='cell1',
-                          help='the folder including RNA-seq bed files of cell 1')
-    opt_parser.add_option('--cell2', dest='cell2',
-                          help='the folder including RNA-seq bed files of cell 2')
+    opt_parser.add_option('--cell1', dest='cell1', help='the folder including RNA-seq bed files of cell 1')
+    opt_parser.add_option('--cell2', dest='cell2', help='the folder including RNA-seq bed files of cell 2')
     opt_parser.add_option('--refgenes', dest='refgenes', help='the ref genes file path')
     options, args = opt_parser.parse_args()
     cell1 = options.cell1

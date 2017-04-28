@@ -40,14 +40,14 @@ def get_DEgenes_from_DEseq_result(deseq_file, limit_pvalue, more_or_less='>', va
 
 
 def test_get_DEgenes_from_DEseq_result():
-    os.chdir('F:\\2.MAmotif\\10. HEK293\\5.Hek293_RNAseq')
+    os.chdir('/mnt/HiC_seq/0-info')
     limit_pvalue = 0.01
     up_fc = 1
     down_fc = -1
 
-    get_DEgenes_from_DEseq_result('HEK293_mRNA_UMS_read_count_H1hesc_read_count_DEseq_DE_output.txt',
+    get_DEgenes_from_DEseq_result('Mcf7_read_count_K562_read_count_DEseq_DE_output.txt',
                                   limit_pvalue, '>', up_fc)
-    get_DEgenes_from_DEseq_result('HEK293_mRNA_UMS_read_count_H1hesc_read_count_DEseq_DE_output.txt',
+    get_DEgenes_from_DEseq_result('Mcf7_read_count_K562_read_count_DEseq_DE_output.txt',
                                   limit_pvalue, '<', down_fc)
 
 

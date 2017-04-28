@@ -24,9 +24,9 @@ def get_2gene_list_overlap(genes1_fp, genes2_fp):
     overlap = gs1.intersection(gs2)
     genes1_fn = os.path.basename(genes1_fp)
     genes2_fn = os.path.basename(genes2_fp)
-    # fo = open('_'.join([genes1_fn.split('.')[0], genes2_fn.split('.')[0], 'overlap']) + '.txt', 'w')
-    # [fo.write(name + '\n') for name in overlap]
-    # fo.close()
+    fo = open('_'.join([genes1_fn.split('.')[0], genes2_fn.split('.')[0], 'overlap']) + '.txt', 'w')
+    [fo.write(name + '\n') for name in overlap]
+    fo.close()
     print 'gene set 1(%s): %d' % (genes1_fp, len(gs1))
     print 'gene set 2(%s): %d' % (genes2_fp, len(gs2))
     print 'gene overlap number: %d' % len(overlap)
@@ -65,8 +65,8 @@ def make_2geneset_fisher_exact_test(bkg_gs, gs1, gs2, transcript_id_2symbol=Fals
     enrich_score = cal_enrich_score(bk_len, gs1_len, gs2_len, ol_len)
     # 打印格式：背景基因数目\t基因列表1数目\t基因列表2数目\t基因列表1和基因列表2重叠的数目\tEnrichment score\tP value\n
     out_string = '%d\t%d\t%d\t%d\t%.3f\t%s' % (bk_len, gs1_len, gs2_len, ol_len, enrich_score, str(res[1]))
-    # print out_string
-    return enrich_score
+    print out_string
+    return out_string
 
 
 def fisher_exact_test_wrapper(background_genes, genes1, genes2, transcript_id_2symbol=False, refgene_file=''):
@@ -82,13 +82,12 @@ def fisher_exact_test_wrapper(background_genes, genes1, genes2, transcript_id_2s
 
 
 def test_get_2gene_list_overlap():
-    os.chdir('F:\\3.ChIA-PET\\3.EnhancerStudy\\2.EnhancerDefinedGenes')
-    gsf1 = 'F:\\3.ChIA-PET\\3.EnhancerStudy\\2.GenesRelated\\' \
-           'K562vsMcf7_DEseq_DE_log2FC_1_p0.01_genes_gene_symbol.txt'
-    for fn in os.listdir('.'):
-        if 'Symbol' not in fn or 'Over1' not in fn:
-            continue
-        gsf2 = fn
+    os.chdir('F:\\ChIA-PET\\K562VsMcf7DEgenes')
+    gsf1 = 'K562vsMcf7_DEseq_DE_log2FC_1_p0.01_genes_gene_symbol.txt'
+    for fn in os.listdir('K562CtcfInteratcion_H3K27acDistal_Targenes'):
+        # print fn
+        # gsf2 = 'K562vsMcf7_DEseq_DE_log2FC_1_p0.01_genes_gene_symbol.txt'
+        gsf2 = os.sep.join(['K562CtcfInteratcion_H3K27acDistal_Targenes', fn])
         l1, l2, overlap = get_2gene_list_overlap(gsf1, gsf2)
         table = get_fisher_table(25334, l1, l2, overlap)
         print fisher_exact(table, alternative='greater')

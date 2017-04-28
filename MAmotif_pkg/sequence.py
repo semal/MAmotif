@@ -102,7 +102,7 @@ class Gene(Sequence):
     def __init__(self, name, name2, chrm, start, end, strand):
         Sequence.__init__(self, chrm, start, end, strand)
         self.__name = name
-        self.name2 = name2  # gene official symbol
+        self.name2 = name2
 
     @property
     def tss(self):
@@ -209,9 +209,7 @@ class Peak(Sequence):
             return '%s\t%d\t%d\n' % (self.chrm, self.start, self.end)
 
     def __eq__(self, other):
-        return self.chrm.lower() == other.chrm.lower() and \
-               self.start == other.start and \
-               self.end == other.end
+        return self.chrm == other.chrm and self.start == other.start and self.end == other.end
 
 
 class Sequences(object):
@@ -368,8 +366,7 @@ class GeneSet(Sequences):
         if not self.__is_grouped:
             self.__group = self.group_by_chromosomes()
             self.__is_grouped = True
-            self.__group_tss = \
-                {key: np.array([gene.tss for gene in self.__group[key]]) for key in self.__group.keys()}
+            self.__group_tss = {key: np.array([gene.tss for gene in self.__group[key]]) for key in self.__group.keys()}
         try:
             genes_chr = self.__group[peak.chrm]
         except:

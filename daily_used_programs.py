@@ -1,20 +1,20 @@
 # coding=utf-8
-# 将从macs到MAmotif的分析自动化，只适用于mm9的组蛋白修饰的数据
+# 将从macs到MAmotif的分析自动化，只适用于hg19的组蛋白修饰的数据
 import os
 import subprocess
 import sys
 import time
 import re
-from constant import mm9_refgenes_file as mm9  # 现在适用于mm9
+from constant import hg19_refgenes_file as hg19  # 现在适用于hg19
 from constant import jaspar3_file as jaspar
 
 
 macs_fd, manorm_fd, motifscan_fd, mamotif_fd = '1.MACS', '2.MAnorm', '3.MotifScan', '4.MAmotif'
 cut_top_peaks_cmd_fp = '/home/zhaohui/bin/macstools/get_top_num_peaks.py'
 cut_p_peaks_cmd_fp = '/home/zhaohui/bin/macstools/cut_peaks_with_pvalue.py'
-manorm_cmd_fp = 'MAnormFast'
+manorm_cmd_fp = '/home/zhaohui/MAnorm_optimize/MAnorm_entrance'
 motifscan_cmd_fp = '/mnt/MAmotif/motifscan_pkg/motifscan_pkg/motifscan'
-mamotif_cmd_fp = '/home/zhaohui/MAmotif/MAmotif.py'
+mamotif_cmd_fp = '/home/zhaohui/MAmotif/MAmotif_test'
 
 
 def make_dir(fd_name):
@@ -124,9 +124,8 @@ def run_manorm(xls_peak_fp1, read_fp1, xls_peak_fp2, read_fp2, comparison_name):
                       '--r2': read_fp2,
                       '-s': '',
                       '-o': comparison_name}
-    cmd = '%s ' % manorm_cmd_fp + get_options(common_options) + \
-          ' > %s_MAnorm_output.log' % comparison_name
-    print cmd
+    cmd = 'python %s ' % manorm_cmd_fp + get_options(common_options) + ' > %s_MAnorm_output.log' % comparison_name
+    # print cmd
     try:
         os.chdir(comparison_name)
         manorm_pk_fp1 = os.path.abspath(os.path.basename(xls_peak_fp1).replace('.xls', '_MAvalues.xls'))
@@ -158,8 +157,8 @@ def run_motifscan(macs_xls_fp):
     common_options = {'-p': macs_xls_fp,
                       '-f': 'macs',
                       '-m': jaspar,
-                      '-g': 'mm9',
-                      '-t': mm9,
+                      '-g': 'hg19',
+                      '-t': hg19,
                       '-e': ''}
     cmd = 'python %s ' % motifscan_cmd_fp + get_options(common_options)
     motifscan_pkl_fp = \
@@ -187,8 +186,7 @@ def run_mamotif_pipeline(treatment_fp1, control_fp1, name1, treatment_fp2, contr
     print '#3 running MotifScan ...'
     # motifscan_pkl_fp1 = run_motifscan(macs_xls_peak_fp1)
     # motifscan_pkl_fp2 = run_motifscan(macs_xls_peak_fp2)
-    motifscan_pkl_fp1, motifscan_pkl_fp2 = \
-        map(run_motifscan, [macs_xls_peak_fp1, macs_xls_peak_fp2])
+    motifscan_pkl_fp1, motifscan_pkl_fp2 = map(run_motifscan, [macs_xls_peak_fp1, macs_xls_peak_fp2])
     time.sleep(2)
     print '#4 running MAmotif ...'
     os.chdir(working_fd)
@@ -196,27 +194,26 @@ def run_mamotif_pipeline(treatment_fp1, control_fp1, name1, treatment_fp2, contr
     cmd1 = 'python %s ' % mamotif_cmd_fp + \
            '-p %s ' % manorm_pk_fp1 + \
            '-M %s ' % motifscan_pkl_fp1 + \
-           '-r %s' % mm9
+           '-r %s' % hg19
     os.system(cmd1)
     cmd2 = 'python %s ' % mamotif_cmd_fp + \
            '-p %s ' % manorm_pk_fp2 + \
            '-M %s ' % motifscan_pkl_fp2 + \
-           '-r %s ' % mm9 + '-n'
-    # 因为都在同一个文件夹下，避免同时创建文件夹时出现死锁的情况不使用多进程同时运行cmd1和cmd2
-    os.system(cmd2)
+           '-r %s ' % hg19 + '-n'
+    os.system(cmd2)  # 因为都在同一个文件夹下，避免同时创建文件夹时出现死锁的情况不使用多进程同时运行cmd1和cmd2
 
 
 def test_run_mamotif_pipeline():
     # os.chdir('/mnt/MAmotif/2.Processing/7.primed_vs_naive/New_version')
     # working_fd = '/mnt/MAmotif/2.Processing/7.primed_vs_naive/New_version'
-    read_fp1 = '/mnt/MAmotif/1.RAWdata/Mixed_primed_naive_hESC_public_mm9/GSE59434_primed_vs_naive_MIT/' \
+    read_fp1 = '/mnt/MAmotif/1.RAWdata/Mixed_primed_naive_hESC_public_hg19/GSE59434_primed_vs_naive_MIT/' \
                'hESC_WIBR2_primed_H3K4me3_MIT.bed'
-    input_fp1 = '/mnt/MAmotif/1.RAWdata/Mixed_primed_naive_hESC_public_mm9/GSE59434_primed_vs_naive_MIT/' \
+    input_fp1 = '/mnt/MAmotif/1.RAWdata/Mixed_primed_naive_hESC_public_hg19/GSE59434_primed_vs_naive_MIT/' \
                 'hESC_WIBR2_primed_H3K4me3_MIT_input.bed'
     name1 = 'hESC_WIBR2_primed_H3K4me3_MIT_P100'
-    read_fp2 = '/mnt/MAmotif/1.RAWdata/Mixed_primed_naive_hESC_public_mm9/GSE59434_primed_vs_naive_MIT/' \
+    read_fp2 = '/mnt/MAmotif/1.RAWdata/Mixed_primed_naive_hESC_public_hg19/GSE59434_primed_vs_naive_MIT/' \
                'hESC_WIBR2_6iLA_naive_H3K4me3_MIT.bed'
-    input_fp2 = '/mnt/MAmotif/1.RAWdata/Mixed_primed_naive_hESC_public_mm9/GSE59434_primed_vs_naive_MIT/' \
+    input_fp2 = '/mnt/MAmotif/1.RAWdata/Mixed_primed_naive_hESC_public_hg19/GSE59434_primed_vs_naive_MIT/' \
                 'hESC_WIBR2_6iLA_naive_H3K4me3_MIT_input.bed'
     name2 = 'hESC_WIBR2_naive_H3K4me3_MIT_P100'
     comparison_name = 'H3K4me3_hESC_WIBR2_primed_vs_naive_MIT_P100'

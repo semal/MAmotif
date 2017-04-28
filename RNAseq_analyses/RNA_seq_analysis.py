@@ -153,8 +153,7 @@ def output_refgenes_rpkm(refgene_file, name4save, rna_seq_files):
         result.append(ref_tool)
     ref_genes = result[0].ref_genes
     for i, rg in enumerate(ref_genes):
-        line = rg.name + '\t'  # transcript id
-        line += rg.name2 + '\t'  # gene symbol
+        line = rg.name2 + '\t'
         line += '\t'.join([str(gene.read_density) for gene in [tool.ref_genes[i] for tool in result]])
         line += '\n'
         file2save.write(line)

@@ -1,12 +1,102 @@
 # coding=utf-8
 from numpy.random.mtrand import normal
-import os
 from scipy.stats import fisher_exact
 from scipy.stats.distributions import norm
 
 from MAmotif_pkg import *
 import constant
 import io_related
+
+
+def temp1():
+        """
+        用K4me3的peaks去除掉K27ac distal区域与K4me3的有重叠的部分
+        """
+        # 读取并合并k4me3的两个replicate
+        k4me3_rep1 = read_MAnorm_peaks(os.sep.join(['data', 'K4me3_wt_pcut10_bound_region.txt']))
+        seqs1 = Sequences()
+        seqs1.set_sequences(k4me3_rep1)
+
+        # k4me3_rep2 = read_MACS_peaks(os.sep.join(['data', 'H1hesc_H3k4me3_Rep2_macs13_peaks_nomodel.xls']))
+        # seqs2 = Sequences()
+        # seqs2.set_sequences(k4me3_rep2)
+
+        seqs = seqs1
+        group_seqs = seqs.group_by_chromosomes()
+
+        # 读取k27ac distal的peaks
+        k27ac_distal = read_MAnorm_peaks(os.sep.join(['data', 'Esb4_H3K27ac_LICR_Rep2_distal_peak_MAvalues.xls']))
+        peaks = MAnormPeakSet()
+        peaks.set_sequences(k27ac_distal)
+        group_peaks = peaks.group_by_chromosomes()
+        # 去除到与k4me3有overlap的peaks
+        left_peaks = []
+        for chrm in group_peaks.keys():
+            if chrm not in group_seqs.keys():
+                continue
+            seqs_start = np.array([seq.start for seq in group_seqs[chrm]])
+            seqs_end = np.array([seq.end for seq in group_seqs[chrm]])
+            for pk in group_peaks[chrm]:
+                claus = 1.0 * (pk.end - seqs_start) * (seqs_end - pk.start)
+                if claus[claus > 0].size == 0:
+                    left_peaks.append(pk)
+
+        # 输出剩下的peaks
+        left_peak_set = MAnormPeakSet()
+        left_peak_set.set_sequences(left_peaks)
+        fi = open(
+            'data/mouse_distal_motif_peaks/data/mouse_stringent_distal_motif_peaks/'
+            'Esb4_H3K27ac_LICR_Rep2_stringent_distal_peak_MAvalues.xls', 'w')
+        [fi.write(pk.tostring()) for pk in left_peak_set]
+
+
+def temp2():
+    """
+    将H3K27ac promoter的peak与一组其他peaks做overlap，记录H3K27ac promoter每一个peak的其他peaks的overlap情况
+    """
+    bk_peaks_file = os.sep.join(['data', 'Esb4_H3K27ac_LICR_Rep2_stringent_distal_peak_MAvalues.xls'])
+    bk_peaks = read_MAnorm_peaks(bk_peaks_file)
+    bk_peaks_set = MAnormPeakSet()
+    bk_peaks_set.set_sequences(bk_peaks)
+    group_bk_peaks = bk_peaks_set.group_by_chromosomes()
+    print '背景组peaks的数目是：%d' % bk_peaks_set.size
+
+    tf_peaks_folder = os.sep.join(['key_peaks', 'mouse_TF_peaks'])
+    tf_overlap_flags = {}
+    for tf_file in os.listdir(tf_peaks_folder):
+        print 'calculate %s ...' % tf_file
+        tf_overlap_flags[tf_file] = []
+        tf_file_path = os.sep.join([tf_peaks_folder, tf_file])
+        tf_peaks = read_MAnorm_peaks(tf_file_path)
+        tf_peaks_set = MAnormPeakSet()
+        tf_peaks_set.set_sequences(tf_peaks)
+        group_tf_peaks = tf_peaks_set.group_by_chromosomes()
+
+        for chrm in group_bk_peaks.keys():
+
+            if chrm not in group_tf_peaks.keys():
+                for pk in group_bk_peaks[chrm]:
+                    tf_overlap_flags[tf_file].append(0)
+                continue
+
+            tf_starts = np.array([pk.start for pk in group_tf_peaks[chrm]])
+            tf_ends = np.array([pk.end for pk in group_tf_peaks[chrm]])
+            for pk in group_bk_peaks[chrm]:
+                claus = 1.0 * (pk.end - tf_starts) * (tf_ends - pk.start)
+                if claus[claus > 0].size > 0:
+                    tf_overlap_flags[tf_file].append(1)
+                else:
+                    tf_overlap_flags[tf_file].append(0)
+
+    fi = open('Esb4_H3K27ac_stringent_distal_overlap_flags_with_other_peaks.xls', 'w')
+    header = '\t'.join(['', '', ''] + tf_overlap_flags.keys()) + '\n'
+    fi.write(header)
+    for i in range(bk_peaks_set.size):
+        line = \
+            '%s\t%d\t%d\t' % (bk_peaks_set[i].chrm, bk_peaks_set[i].start, bk_peaks_set[i].end) + \
+            '\t'.join([str(tf_overlap_flags[key][i]) for key in tf_overlap_flags.keys()]) + '\n'
+        fi.write(line)
+    fi.close()
 
 
 def temp3():
@@ -58,8 +148,7 @@ def temp4():
     de_len = len(de_genes)
     znf263_len = len(znf263_genes)
     ol_len = len(overlap)
-    table = \
-        [[ol_len, de_len - ol_len], [znf263_len - ol_len, bk_len - de_len - znf263_len + ol_len]]
+    table = [[ol_len, de_len - ol_len], [znf263_len - ol_len, bk_len - de_len - znf263_len + ol_len]]
     print fisher_exact(table, alternative='greater')
     pass
 
@@ -218,80 +307,6 @@ def download_38_tf_peaks():
         cmd = 'wget -c %s' % download_fp  # 下载命令
         print cmd
 
-
-def five_key_proteins():
-    host_genes = ['BRAF', 'DDR1', 'FGFR1', 'FLT1', 'KDR']
-    host_genes = ['Braf', 'Ddr1', 'Fgfr1', 'Flt1', 'Kdr']
-    from io_related import read_gene_list_file
-    os.chdir('/mnt/MAmotif/3.Analysis/2.mESCImportantGenesRelated/Ese14_H3K4me3_target_genes')
-    gene_fd = '.'
-    for fn in os.listdir(gene_fd):
-        if not fn.endswith('.txt'):
-            continue
-        print fn
-    for g in host_genes:
-        print g
-        for fn in os.listdir(gene_fd):
-            if not fn.endswith('.txt'):
-                continue
-            if not fn.endswith('.txt'):
-                continue
-            geneset = read_gene_list_file(os.sep.join([gene_fd, fn]))
-            if g in geneset:
-                print '1'
-            else:
-                print '0'
-
-
-def temp13():
-    os.chdir('/mnt/MAmotif/2.Processing/3.MotifScan_refseq_promoter')
-    fo = open('refGene_mm9_promoter_modified.bed', 'w')
-    with open('refGene_mm9_promoter.bed') as fi:
-        for line in fi:
-            if '_' in line:
-                continue
-            fo.write(line)
-    fo.close()
-
-
-def temp14():
-    def znf263(fn):
-        with open(fn) as fi:
-            print fn,
-            print ':',
-            for line in fi:
-                if 'ZNF263' in line.upper():
-                    print line,
-    fd = '/mnt/MAmotif/2.Processing/2.Histone_Broad_hg19_H1hESC_MAnorm2/H1hESC_H3K9ac/jaspar_output'
-    os.chdir(fd)
-    for fn in os.listdir('.'):
-        znf263(fn)
-    # znf263('/mnt/MAmotif/2.Processing/5.RNAseq_hg19_DEseq/HEK293_mRNA_UMS_rpkms.txt')
-
-
-def temp15():
-    book = "library2"
-    scripts = 350
-    print vars()
-    print "the %(book)s book contains more than %(scripts)s scripts" % vars()
-
-
-def temp16():
-    from constant import hg19_refgenes_file
-    refgenes = read_refgenes(hg19_refgenes_file)
-    genes = \
-        ['eif2ak3', 'tp53', 'bcl2', 'parp-1', 'stat3', 'cdkn1a', 'egr1', 'bcl3', 'yy1', 'ccnd1',
-         'ccne1', 'myc', 'cdkn1b']  # brca1, brca2
-    genes = ['parp1']
-    for gene in refgenes:
-        # print gene.name2
-        if gene.name2.lower().strip() in genes:
-            genes.remove(gene.name2.lower())
-            print gene.name2, ':'
-            gene.promoter_zone(4000, 2000).prints()
-    print genes
-
-
 if __name__ == '__main__':
-    temp16()
-    # five_key_proteins()
+    # temp11()
+    download_38_tf_peaks()

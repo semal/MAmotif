@@ -1,6 +1,5 @@
 # coding=utf-8
 # 解析david annotation char的输出
-import os
 from scipy.stats import fisher_exact
 
 
@@ -52,10 +51,8 @@ def read_motif_peaks_target_genes(motif_peak_target_genes_file):
     genes = []
     with open(motif_peak_target_genes_file) as fi:
         for line in fi:
-            genes.append(line.strip().upper())
-    genes = set(genes)
-    print '@info: get %d genes in %s' % (len(genes), os.path.basename(motif_peak_target_genes_file))
-    return genes
+            genes.append(line.strip())
+    return set(genes)
 
 
 def calculate_motif_target_genes_enrich_terms(annotation_list, motif_peak_target_genes_file):
@@ -66,18 +63,9 @@ def calculate_motif_target_genes_enrich_terms(annotation_list, motif_peak_target
     for tm in annotated_list:
         all_genes += tm.genes
     background_genes = set(all_genes)
-    print '@info: %d background genes' % len(background_genes)
-    # print background_genes
-    motif_target_genes = \
-        read_motif_peaks_target_genes(motif_peak_target_genes_file).intersection(background_genes)
+    motif_target_genes = read_motif_peaks_target_genes(motif_peak_target_genes_file).intersection(background_genes)
     print \
-        '\t'.join(['term',
-                   'overlap',
-                   'motif_peak_target_genes',
-                   'term_genes',
-                   'background',
-                   'enrich_score',
-                   'pvalue'])
+        '\t'.join(['term', 'overlap', 'motif_peak_target_genes', 'term_genes', 'background', 'enrich_score', 'pvalue'])
     for tm in annotated_list:
         term_genes = set(tm.genes)
         overlap_genes = term_genes.intersection(motif_target_genes)
@@ -95,13 +83,12 @@ def calculate_motif_target_genes_enrich_terms(annotation_list, motif_peak_target
 
 
 if __name__ == '__main__':
-    os.chdir('/mnt/MAmotif/3.Analysis/3.ZNF263TargetGenesAnnotation')
     annotated_list = \
-        get_david_annotation_list(
-            'Ese14_H3K27ac_LICR_Rep2_promoter_peaks_MAvalues_targenes_GOTERM_MF_result.txt')
-
+        get_david_annotation_list('Esb4_H3K27ac_Rep2_promoter_peaks_target_genes_david_annotation_chart.txt')
+    # for t in annotated_list:
+    #     if t.benjamini < 0.001:
+    #         print '%s has %d genes with benjamini pvalue %s' %(t.term, len(t.genes), str(t.benjamini))
     annotated_list = [tm for tm in annotated_list if tm.benjamini < 0.001]
-    motif_peak_target_file = \
-        'Ese14_H3K27ac_LICR_Rep2_promoter_peaks_MAvalues_exist_MZF1_5-13_targenes.txt'
-
+    motif = 'ZNF263'
+    motif_peak_target_file = 'Esb4_H3K27ac_LICR_Rep2_promoter_peak_MAvalues_exist_%s_target_genes.txt' % motif
     calculate_motif_target_genes_enrich_terms(annotated_list, motif_peak_target_file)

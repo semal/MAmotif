@@ -71,19 +71,13 @@ def output_group_peaks_overlap_situation(key_pk_fp, inspect_pk_fdp, log2_m_cut=0
     if log2_m_cut != 0:
         key_pks = [p for p in key_pks if p.mvalue > log2_m_cut]
     key_fn = os.path.basename(key_pk_fp)
-    res_string = '%s(%d)' % (key_fn, len(key_pks)),
-    res_string = res_string[0]
+    print '%s(%d)' % (key_fn, len(key_pks)),
     for fn in os.listdir(inspect_pk_fdp):
         # print fn
         inspect_pk_fp = os.sep.join([inspect_pk_fdp, fn])
         key_overlap_num, inspect_overlap_num = cal_overlap_num(key_pk_fp, inspect_pk_fp, log2_m_cut)
-        mean_overlap = (key_overlap_num + inspect_overlap_num) / 2
-        string = '\t%d, %.2f' % \
-            (mean_overlap, mean_overlap * 1. / min(len(key_pks), len(read_peaks(inspect_pk_fp)))),
-        res_string += string[0]
-    string = '\n',
-    res_string += string[0]
-    return res_string
+        print '\t(%d, %d)' % (key_overlap_num, inspect_overlap_num),
+    print '\n',
 
 
 def output_2group_peaks_overlap_situation(key_pk_fdp, inspect_pk_fdp, log2_m_cut=0.):
@@ -91,18 +85,20 @@ def output_2group_peaks_overlap_situation(key_pk_fdp, inspect_pk_fdp, log2_m_cut
     看两个文件夹内的peak文件之间的重叠情况
     """
     fn_list = os.listdir(inspect_pk_fdp)
-    res_string = '\t%s' % '\t'.join(fn_list)
-    res_string += '\n'
+    print '\t%s' % '\t'.join(fn_list)
     for fn in os.listdir(key_pk_fdp):
         key_pk_fp = os.sep.join([key_pk_fdp, fn])
-        res_string += output_group_peaks_overlap_situation(key_pk_fp, inspect_pk_fdp, log2_m_cut)
-    print res_string
+        output_group_peaks_overlap_situation(key_pk_fp, inspect_pk_fdp, log2_m_cut)
 
 
 def cal_peaks_enrichment(peak_fp, key_peak_fp, simulate_times=1000):
     """
     将一组peaks当做背景参考，称为参考组。然后再给定一组peaks，称为给定组。
     随机模拟一组和给定组一样的peaks，称为模拟组。看给定组和模拟组与参考组的overlap是否有差异
+    @param peak_fp:
+    @param key_peak_fp:
+    @param simulate_times:
+    @return:
     """
 
     print '参考组文件：%s' % peak_fp
@@ -139,8 +135,7 @@ def cal_peaks_enrichment(peak_fp, key_peak_fp, simulate_times=1000):
                 continue
             if chrm not in group_peaks.keys():
                 continue
-            # 对给定组进行随机模拟
-            simulated_chrm_seqs = generate_a_chromosome_seqs(group_key_seqs[chrm], chrm)
+            simulated_chrm_seqs = generate_a_chromosome_seqs(group_key_seqs[chrm], chrm)  # 对给定组进行随机模拟
             overlap_num_chrm = get_overlap_num_in_one_chromosome(group_peaks[chrm], simulated_chrm_seqs)[0]
             temp += overlap_num_chrm
             num_simulate_overlap += overlap_num_chrm
@@ -153,195 +148,86 @@ def cal_peaks_enrichment(peak_fp, key_peak_fp, simulate_times=1000):
     print '随机模拟%d次，出现超过观测值%d的数目：%d\n\n' % (simulate_times, num_overlap, over_times)
 
 
-def get_all_overlap_enrich_matirx(bk_peaks_fp, motif_peaks_fdp, tf_peaks_fdp):
+def get_all_overlap_num(bk_peaks_fp, motif_peaks_fdp, tf_peaks_fdp):
     """
-    将所有的motif组的文件放在一个文件夹，将所有tf组的文件放在另一个文件夹。
-    计算所有motif组和tf组两两之间的overlap数目
+    将所有的motif组的文件放在一个文件夹，将所有tf组的文件放在另一个文件夹。计算所有motif组和tf组两两之间的overlap数目
     """
     bk_peaks = read_MAnorm_peaks(bk_peaks_fp)
     bk_peaks_set = MAnormPeakSet()
     bk_peaks_set.set_sequences(bk_peaks)
-    res_string = ''
-    res_string += 'Background(%s) peaks count: %d\n' % (bk_peaks_fp, bk_peaks_set.size)
+    # group_bk_peaks = bk_peaks_set.group_by_chromosomes()
+    print '背景组(%s)peaks的数目是：%d' % (bk_peaks_fp, bk_peaks_set.size)
 
     motifs_peak_num = []
-    motif_peaks_list = []
     for motif_file in os.listdir(motif_peaks_fdp):
         motif_file_path = os.sep.join([motif_peaks_fdp, motif_file])
         motif_peaks = read_MAnorm_peaks(motif_file_path)
-        motif_peaks_list.append(motif_peaks)
         motifs_peak_num.append(len(motif_peaks))
     first_line = \
         '\t'.join(['%s(%d)' % (name[:-4], num) for name, num in
                    zip(os.listdir(motif_peaks_fdp), motifs_peak_num)])
-    res_string += '\t%s\n' % first_line
+    print '\t%s' % first_line
 
     for tf_file in os.listdir(tf_peaks_fdp):
         tf_file_path = os.sep.join([tf_peaks_fdp, tf_file])
-        tf_peaks = read_MAnorm_peaks(tf_file_path)
-        # try:
-        #     tf_peaks = read_bed_peaks(tf_file_path)
-        # except:
-        #     continue
+        tf_peaks = read_bed_peaks(tf_file_path)
         tf_peaks_set = PeakSet()
         tf_peaks_set.set_sequences(tf_peaks)
+        # group_tf_peaks = tf_peaks_set.group_by_chromosomes()
         tf_overlap_num, tf_overlap_pks = \
             __cal_overlap_num(bk_peaks_set, tf_peaks_set)  # tf peaks与背景组peaks的重叠数目
-        res_string += '%s:%d/%d' % (tf_file.split('.')[0], tf_overlap_num, tf_peaks_set.size)
+        # bk_overlap_num = cal_overlap_num(group_tf_peaks, group_bk_peaks)  # tf peaks与背景组peaks的重叠数目
+        # print '与背景的overlap数：%d' % bk_overlap_num
+        print '%s:%d/%d' % (tf_file.split('.')[0], tf_overlap_num, tf_peaks_set.size),
 
-        for motif_peaks in motif_peaks_list:
+        for motif_file in os.listdir(motif_peaks_fdp):
+            motif_file_path = os.sep.join([motif_peaks_fdp, motif_file])
+            motif_peaks = read_MAnorm_peaks(motif_file_path)
             motif_peaks_set = MAnormPeakSet()
             motif_peaks_set.set_sequences(motif_peaks)
+            # group_motif_peaks = motif_peaks_set.group_by_chromosomes()
             motif_overlap_num, motif_overlap_pks = \
                 __cal_overlap_num(bk_peaks_set, motif_peaks_set)  # motif peaks与背景组peaks的重叠数目
             overlap_num, overlap_pks = \
                 __cal_overlap_num(motif_overlap_pks, tf_overlap_pks)  # motif peaks和tf peaks的重叠数目
 
+            # print 'back overlap number: %d' % bk_overlap_num
+            # print 'motif overlap number: %d' % motif_overlap_num
             table = [[overlap_num, tf_overlap_num - overlap_num],
                      [motif_overlap_num - overlap_num,
                       bk_peaks_set.size - tf_overlap_num - motif_overlap_num + overlap_num]]
+            # print table
 
             odd_ratio, pvalue = fisher_exact(table, alternative='greater')
             try:
                 enrichment_score = \
                     1. * overlap_num / (tf_overlap_num * motif_overlap_num / bk_peaks_set.size)
-                res_string += '\t%.7f,%s,%d' % (enrichment_score, str(pvalue), overlap_num)
+                print '\t%.7f,%s,%d' % (enrichment_score, str(pvalue), overlap_num),
+                # print '\t%.7f' % enrichment_score,
             except ZeroDivisionError:
                 enrichment_score = '1'
-                res_string += '\t%s,%s,%d' % (enrichment_score, str(pvalue), overlap_num)
-        res_string += '\n'
-    print res_string
+                print '\t%s,%s,%d' % (enrichment_score, str(pvalue), overlap_num),
+                # print '\t%s' % enrichment_score,
+        print '\n',
 
 
-def get_stringent_distal_peaks(pkfp, H3K4me3_fp):
-        """
-        用K4me3的peaks去除掉K27ac distal区域与K4me3的有重叠的部分
-        """
-        # 读取并合并k4me3的两个replicate
-        k4me3_rep1 = read_MAnorm_peaks(H3K4me3_fp)
-        seqs1 = Sequences()
-        seqs1.set_sequences(k4me3_rep1)
-
-        # k4me3_rep2 = read_MACS_peaks(os.sep.join(['data', 'H1hesc_H3k4me3_Rep2_macs13_peaks_nomodel.xls']))
-        # seqs2 = Sequences()
-        # seqs2.set_sequences(k4me3_rep2)
-
-        seqs = seqs1
-        group_seqs = seqs.group_by_chromosomes()
-
-        # 读取k27ac distal的peaks
-        k27ac_distal = read_MAnorm_peaks(pkfp)
-        peaks = MAnormPeakSet()
-        peaks.set_sequences(k27ac_distal)
-        group_peaks = peaks.group_by_chromosomes()
-        # 去除到与k4me3有overlap的peaks
-        left_peaks = []
-        for chrm in group_peaks.keys():
-            if chrm not in group_seqs.keys():
-                continue
-            seqs_start = np.array([seq.start for seq in group_seqs[chrm]])
-            seqs_end = np.array([seq.end for seq in group_seqs[chrm]])
-            for pk in group_peaks[chrm]:
-                claus = 1.0 * (pk.end - seqs_start) * (seqs_end - pk.start)
-                if claus[claus > 0].size == 0:
-                    left_peaks.append(pk)
-
-        # 输出剩下的peaks
-        left_peak_set = MAnormPeakSet()
-        left_peak_set.set_sequences(left_peaks)
-        file2save = pkfp.replace('distal', 'stringent_distal')
-        fi = open(file2save, 'w')
-        [fi.write(pk.tostring()) for pk in left_peak_set]
-
-
-def get_overlap_flags(bk_pk_fp, tf_pk_fdp, res2save):
-    """
-    将H3K27ac promoter的peak与一组其他peaks做overlap，
-    记录H3K27ac promoter每一个peak的其他peaks的overlap情况
-    """
-    bk_peaks = read_MAnorm_peaks(bk_pk_fp)
-    bk_peaks_set = MAnormPeakSet()
-    bk_peaks_set.set_sequences(bk_peaks)
-    group_bk_peaks = bk_peaks_set.group_by_chromosomes()
-    print 'background peaks count: %d' % bk_peaks_set.size
-
-    tf_overlap_flags = {}
-    for tf_file in os.listdir(tf_pk_fdp):
-        print 'calculate %s ...' % tf_file
-        tf_overlap_flags[tf_file] = []
-        tf_file_path = os.sep.join([tf_pk_fdp, tf_file])
-        tf_peaks = read_MAnorm_peaks(tf_file_path)
-        tf_peaks_set = MAnormPeakSet()
-        tf_peaks_set.set_sequences(tf_peaks)
-        group_tf_peaks = tf_peaks_set.group_by_chromosomes()
-
-        for chrm in group_bk_peaks.keys():
-
-            if chrm not in group_tf_peaks.keys():
-                for pk in group_bk_peaks[chrm]:
-                    tf_overlap_flags[tf_file].append(0)
-                continue
-
-            tf_starts = np.array([pk.start for pk in group_tf_peaks[chrm]])
-            tf_ends = np.array([pk.end for pk in group_tf_peaks[chrm]])
-            for pk in group_bk_peaks[chrm]:
-                claus = 1.0 * (pk.end - tf_starts) * (tf_ends - pk.start)
-                if claus[claus > 0].size > 0:
-                    tf_overlap_flags[tf_file].append(1)
-                else:
-                    tf_overlap_flags[tf_file].append(0)
-    fi = open(res2save, 'w')
-    header = '\t'.join(['', '', ''] + tf_overlap_flags.keys()) + '\n'
-    fi.write(header)
-    for i in range(bk_peaks_set.size):
-        line = \
-            '%s\t%d\t%d\t' % (bk_peaks_set[i].chrm, bk_peaks_set[i].start, bk_peaks_set[i].end) + \
-            '\t'.join([str(tf_overlap_flags[key][i]) for key in tf_overlap_flags.keys()]) + '\n'
-        fi.write(line)
-    fi.close()
-
-
-def test_output_group_peaks_overlap_situation():
-    key_pk_fp = '/mnt/MAmotif/1.RAWdata/3.ValidatedUsingPeaksAndReads/K27ac_wt_FDR5_peaks.xls'
-    inspect_pk_fdp = '/mnt/MAmotif/2.Processing/1.Histone_LICR_mm9_peaks/cut_peaks/H3K27ac/Rep1'
+def test_output_two_group_peaks_overlap_situation():
+    key_pk_fp = 'F:\\MAmotif\\7. primed_naive_hESC\\7. comparison_with_Broad_peaks\\MAnorm_peaks\\Broad\\' \
+                'H1hESC_H3K4me3_Broad_Rep1_peaks_MAvalues.xls'
+    inspect_pk_fdp = 'F:\\MAmotif\\7. primed_naive_hESC\\7. comparison_with_Broad_peaks\\MAnorm_peaks\\primed_vs_naive'
     output_group_peaks_overlap_situation(key_pk_fp, inspect_pk_fdp)
 
 
 def test_output_2group_peaks_overlap_situation():
-    os.chdir('/mnt/MAmotif/3.Analysis/2.mm9KeyPeaksTFsEnrich/Ese14')
-    key_pk_fdp = 'MotifExistPeaksInStringentDistal'
-    inspect_pk_fdp = 'MotifExistPeaksInStringentDistal'
+    key_pk_fdp = 'F:\\MAmotif\\7. primed_naive_hESC\\7.comparison_with_Broad_peaks\\macs_peaks\\Broad_peaks\\cut_peaks'
+    inspect_pk_fdp = \
+        'F:\\MAmotif\\7. primed_naive_hESC\\7.comparison_with_Broad_peaks\\macs_peaks\\naive_peaks\\cut_peaks'
     output_2group_peaks_overlap_situation(key_pk_fdp, inspect_pk_fdp)
 
-
-def test_get_all_overlap_enrich_matrix():
-    os.chdir('/mnt/MAmotif/3.Analysis/2.mm9KeyPeaksTFsEnrich')
-    bk_fp = 'Esb4/Esb4_H3K27ac_LICR_Rep2_stringent_distal_peak_MAvalues.xls'
-    mfpd = 'Esb4/MotifExistPeakInStringentDistal'
-    tffpd = 'Esb4/MotifExistPeakInStringentDistal/'
-    get_all_overlap_enrich_matirx(bk_fp, mfpd, tffpd)
-
-
-def test_get_stringent_distal_peaks():
-    pkfp = \
-        '/mnt/MAmotif/3.Analysis/2.mm9KeyPeaksTFsEnrich/Ese14/' \
-        'Ese14_H3K27ac_LICR_Rep2_distal_peaks_MAvalues.xls'
-    H3K4me3_fp = '/mnt/MAmotif/2.Processing/4.Esb4_and_Ese14_H3K4me3_MAmotif/2.MAnorm/' \
-                 'H3K4me3_Ese14_vs_Cbellum_Rep1_P100/Ese14_H3K4me3_LICR_Rep1_P100_peaks_MAvalues.xls'
-    get_stringent_distal_peaks(pkfp, H3K4me3_fp)
-
-
-def test_get_overlap_flags():
-    os.chdir('/mnt/MAmotif/3.Analysis/2.mm9KeyPeaksTFsEnrich/Ese14')
-    pf = 'Ese14_H3K27ac_LICR_Rep2_stringent_distal_peaks_MAvalues.xls'
-    tf = '/mnt/MAmotif/3.Analysis/2.mm9KeyPeaksTFsEnrich/Ese14/MotifExistPeaksInStringentDistal/'
-    get_overlap_flags(pf, tf,
-                      'Ese14_H3K27ac_stringent_distal_4col_overlap_flags_with_other_peaks.xls')
-
-
 if __name__ == '__main__':
-    # test_output_group_peaks_overlap_situation()
+    # test_output_two_group_peaks_overlap_situation()
     # test_output_2group_peaks_overlap_situation()
-    test_get_all_overlap_enrich_matrix()
-    # test_get_stringent_distal_peaks()
-    # test_get_overlap_flags()
+    os.chdir('F:\\MAmotif\\4. key_peaks_tfs_enrich')
+    get_all_overlap_num('H1hesc_H3K27ac_Broad_Rep2_stringent_distal_peak_MAvalues.xls',
+                        'H1hESC_H3K27ac_stringent_distal_motifs_peak',
+                        '38_tfs_peak')

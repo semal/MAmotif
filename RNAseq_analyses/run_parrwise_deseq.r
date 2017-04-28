@@ -7,11 +7,8 @@ Nrep2 <- treatment_num						# number of replicates for treatment
 
 # read in data information #	
 datafile <- paste(datatype, ".txt", sep="")
-head(datafile)
 countTable <- read.table(datafile, header=TRUE, row.names=1)
-head(countTable)
 condition = c(rep("control", times=Nrep1), rep("treatment", times=Nrep2))
-head(condition)
 
 cds = newCountDataSet(countTable,condition)
 
@@ -21,8 +18,7 @@ sizeFactors(cds)
 head(counts(cds,normalized=TRUE))
 
 # estimate variance #
-if(Nrep1==1 || Nrep2==1) cds=estimateDispersions(cds,method="blind",sharingMode="fit-only") else
-cds=estimateDispersions(cds,fitType="local")
+if(Nrep1==1 || Nrep2==1) cds=estimateDispersions(cds,method='blind',sharingMode="fit-only") else cds=estimateDispersions(cds)
 plotDispEsts(cds)
 
 # call differential expression

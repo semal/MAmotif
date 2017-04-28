@@ -54,9 +54,7 @@ def put_2together(file1, file2):
     """
     put 2 read count output file together with same format
     """
-    file1_name = os.path.basename(file1)[:-4]
-    file2_name = os.path.basename(file2)[:-4]
-    file_new = '_'.join([file1_name, file2_name]) + '.txt'
+    file_new = '_'.join([file1[:-4], file2[:-4]]) + '.txt'
     fi = open(file_new, 'w')
 
     gene_names = []

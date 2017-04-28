@@ -1,8 +1,7 @@
 # coding=utf-8
-# 将peaks按照是否有某个motif可以分成两类，如果这个motif是细胞特异性的motif，
-# 那么它倾向于被对应的关键TF所直接binding，
-# 结果是导致这些peak的M值的绝对值更大，当我们拿有此Motif的peaks的M值组和没有此Motif的peaks的M值组
-# 做t-test和rank-sum-test的时候，观察到的结果就应该是有显著的差异（p值很小）
+# 将peaks按照是否有某个motif可以分成两类，如果这个motif是细胞特异性的motif，那么它倾向于被对应的关键TF所直接binding，
+# 结果是导致这些peak的M值的绝对值更大，当我们拿有此Motif的peaks的M值组和没有此Motif的peaks的M值组做t-test和rank-sum-test的时
+# 候，观察到的结果就应该是有显著的差异（p值很小）
 from import_MAmotif import motif_classified_pks_ttest
 
 

@@ -38,10 +38,9 @@ def violin_plot(data1, motifs, data2, **kwargs):
         except TypeError:
             d1, d2 = data1[pos], data2[pos]
         half_violin_plot(d1, pos, False, facecolor='r')
-        half_violin_plot(d2, pos, True, facecolor='g')
+        half_violin_plot(d2, pos, True, facecolor='b')
         # division line between the two half
         plt.plot([pos] * 2, [min(min(d1), min(d2)), max(max(d1), max(d2))], 'k-', linewidth=2)
-
     ax.set_xticks(positions)
     ax.set_xticklabels(motifs)
     ax.set_yticks(range(-5, 15, 5))
@@ -81,119 +80,6 @@ def violin_viewer(pk_file, motifscan_file, motif_pos, limit_pvalue=0.001, neg=Fa
     plt.close()
 
 
-def violin_plot2():
-    os.chdir('F:\\2.MAmotif\\7. Violin_plot\\1.H1hESC_H3K27ac_Rep2_peaks')
-    from statsmodels.graphics.boxplots import violinplot
-    import numpy as np
-
-    def read_mvalues(fp):
-        m = []
-        with open(fp) as fi:
-            for line in fi:
-                m.append(float(line))
-        return m
-
-    m11 = read_mvalues('H1hesc_H3K27ac_Broad_Rep2_peak_MAvalues_absent_Pou5f1.txt')
-    m12 = read_mvalues('H1hesc_H3K27ac_Broad_Rep2_peak_MAvalues_exist_Pou5f1.txt')
-    m11 = np.array(m11)
-    m12 = np.array(m12)
-
-    m21 = read_mvalues('H1hesc_H3K27ac_Broad_Rep2_peak_MAvalues_absent_Sox2.txt')
-    m22 = read_mvalues('H1hesc_H3K27ac_Broad_Rep2_peak_MAvalues_exist_Sox2.txt')
-    m21 = np.array(m21)
-    m22 = np.array(m22)
-
-    m31 = read_mvalues('H1hesc_H3K27ac_Broad_Rep2_peak_MAvalues_absent_Spz1.txt')
-    m32 = read_mvalues('H1hesc_H3K27ac_Broad_Rep2_peak_MAvalues_exist_Spz1.txt')
-    m31 = np.array(m31)
-    m32 = np.array(m32)
-
-    m41 = read_mvalues('H1hesc_H3K27ac_Broad_Rep2_peak_MAvalues_absent_HNF4G.txt')
-    m42 = read_mvalues('H1hesc_H3K27ac_Broad_Rep2_peak_MAvalues_exist_HNF4G.txt')
-    m41 = np.array(m41)
-    m42 = np.array(m42)
-
-    import matplotlib.pyplot as plt
-    fig = plt.figure()
-    ax = fig.add_subplot(211)
-    ax.set_ylim([-7, 12])
-    ax.set_ylabel('M value')
-    # ax.set_xlabel('H1hESC')
-    # plt.grid(True)
-
-    labels = ['Pou5f1', 'Sox2', 'Spz1', 'HNF4G']
-    m_right = [m11, m21, m31, m41]
-    m_left = [m12, m22, m32, m42]
-    violinplot(m_right, labels=labels, side='right', ax=ax, show_boxplot=False,
-               plot_opts={'violin_fc': 'g'})
-    violinplot(m_left, labels=labels, side='left', ax=ax, show_boxplot=False,
-               plot_opts={'violin_fc': 'r'})
-
-    ax.plot([1, 1.15], [m11.mean(), m11.mean()], 'g', linewidth=2, alpha=.5)
-    ax.plot([1+1, 1.15+1], [m21.mean(), m21.mean()], 'g', linewidth=2, alpha=.5)
-    ax.plot([1+1+1, 1.15+1+1], [m31.mean(), m31.mean()], 'g', linewidth=2, alpha=.5)
-    ax.plot([1+1+1+1, 1.15+1+1+1], [m41.mean(), m41.mean()], 'g', linewidth=2, alpha=.5)
-
-    ax.plot([1-0.15, 1], [m12.mean(), m12.mean()], 'r', linewidth=2, alpha=.5)
-    ax.plot([1-0.15+1, 1+1], [m22.mean(), m22.mean()], 'r', linewidth=2, alpha=.5)
-    ax.plot([1-0.15+1+1, 1+1+1], [m32.mean(), m32.mean()], 'r', linewidth=2, alpha=.5)
-    ax.plot([1-0.15+1+1+1, 1+1+1+1], [m42.mean(), m42.mean()], 'r', linewidth=2, alpha=.5)
-
-    os.chdir('F:\\2.MAmotif\\7. Violin_plot\\1.K562_H3K27ac_Rep2_peaks')
-    m11 = read_mvalues('K562_H3K27ac_Broad_Rep2_Top25K_peak_MAvalues_absent_TAL1__GATA1.txt')
-    m12 = read_mvalues('K562_H3K27ac_Broad_Rep2_Top25K_peak_MAvalues_exist_TAL1__GATA1.txt')
-    m11 = [-m for m in m11]
-    m12 = [-m for m in m12]
-    m11 = np.array(m11)
-    m12 = np.array(m12)
-
-    m21 = read_mvalues('K562_H3K27ac_Broad_Rep2_Top25K_peak_MAvalues_absent_Gata1.txt')
-    m22 = read_mvalues('K562_H3K27ac_Broad_Rep2_Top25K_peak_MAvalues_exist_Gata1.txt')
-    m21 = [-m for m in m21]
-    m22 = [-m for m in m22]
-    m21 = np.array(m21)
-    m22 = np.array(m22)
-
-    m31 = read_mvalues('K562_H3K27ac_Broad_Rep2_Top25K_peak_MAvalues_absent_Spz1.txt')
-    m32 = read_mvalues('K562_H3K27ac_Broad_Rep2_Top25K_peak_MAvalues_exist_Spz1.txt')
-    m31 = [-m for m in m31]
-    m32 = [-m for m in m32]
-    m31 = np.array(m31)
-    m32 = np.array(m32)
-
-    m41 = read_mvalues('K562_H3K27ac_Broad_Rep2_Top25K_peak_MAvalues_absent_HNF4G.txt')
-    m42 = read_mvalues('K562_H3K27ac_Broad_Rep2_Top25K_peak_MAvalues_exist_HNF4G.txt')
-    m41 = [-m for m in m41]
-    m42 = [-m for m in m42]
-    m41 = np.array(m41)
-    m42 = np.array(m42)
-
-    labels = ['TAL1::GATA1', 'Gata1', 'Spz1', 'HNF4G']
-    m_right = [m11, m21, m31, m41]
-    m_left = [m12, m22, m32, m42]
-    ax = fig.add_subplot(212)
-    ax.set_ylim([-7, 12])
-    ax.set_ylabel('-M value')
-    # ax.set_xlabel('K562')
-    # plt.grid(True)
-    violinplot(m_right, labels=labels, side='right', ax=ax, show_boxplot=False,
-               plot_opts={'violin_fc': 'g'})
-    violinplot(m_left, labels=labels, side='left', ax=ax, show_boxplot=False,
-               plot_opts={'violin_fc': 'r'})
-
-    ax.plot([1, 1.15], [m11.mean(), m11.mean()], 'g', linewidth=2, alpha=.5)
-    ax.plot([1+1, 1.15+1], [m21.mean(), m21.mean()], 'g', linewidth=2, alpha=.5)
-    ax.plot([1+1+1, 1.15+1+1], [m31.mean(), m31.mean()], 'g', linewidth=2, alpha=.5)
-    ax.plot([1+1+1+1, 1.15+1+1+1], [m41.mean(), m41.mean()], 'g', linewidth=2, alpha=.5)
-
-    ax.plot([1-0.15, 1], [m12.mean(), m12.mean()], 'r', linewidth=2, alpha=.5)
-    ax.plot([1-0.15+1, 1+1], [m22.mean(), m22.mean()], 'r', linewidth=2, alpha=.5)
-    ax.plot([1-0.15+1+1, 1+1+1], [m32.mean(), m32.mean()], 'r', linewidth=2, alpha=.5)
-    ax.plot([1-0.15+1+1+1, 1+1+1+1], [m42.mean(), m42.mean()], 'r', linewidth=2, alpha=.5)
-
-    plt.show()
-
-
 def test():
     import os
     dir = 'F:\\MAmotif.py\\7. K562_peaks'
@@ -220,5 +106,4 @@ def test():
 
 
 if __name__ == '__main__':
-    # test()
-    violin_plot2()
+    test()
