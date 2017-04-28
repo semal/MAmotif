@@ -1,0 +1,69 @@
+#!/usr/bin/env python
+# coding=utf-8
+# 这个脚本将MAmotif这个项目要做的常规分析写成了一个简单的pipeline，用户指定某个MAnorm结果当中的2set的peaks,此脚本
+# 将生成一个和指定MAnorm结果相同的文件夹，在此文件夹下将输出将指定peaks分成promoter peaks和distal peaks, 并对
+# 2set peaks，promoter peaks和distal peaks都做MAmotif test(就是将peaks按照是否存在某个motif分成两组M值做分布差异的检验)
+from optparse import OptionParser
+import os
+
+from MAmotif_pkg import classify_MAnorm_pks_by_promoter, motif_classified_pks_ttest
+
+
+def run_MAmotif_pipeline(
+        comparison_pk, motifscan_result,
+        refgene_file='', correction_type='benjamin', neg=False, no_fd=True):
+    comparison_pk = os.path.abspath(comparison_pk)
+    motifscan_result = os.path.abspath(motifscan_result)
+    MAnorm_name = comparison_pk.split(os.sep)[-2]
+    if not no_fd:
+        if not os.path.exists(MAnorm_name):
+            os.mkdir(MAnorm_name)
+        os.chdir(MAnorm_name)
+    # classify pk into promoter_pk and distal-pk
+    if refgene_file == '':
+        motif_classified_pks_ttest(
+            comparison_pk, motifscan_result, correction_type=correction_type, negative=neg)
+    else:
+        promoter_pk, distal_pk = classify_MAnorm_pks_by_promoter(comparison_pk, refgene_file)
+        # motifs classified peaks test for pk, promoter_pk and distal_pk
+        motif_classified_pks_ttest(
+            comparison_pk, motifscan_result, correction_type=correction_type, negative=neg)
+        motif_classified_pks_ttest(
+            promoter_pk, motifscan_result, correction_type=correction_type, negative=neg)
+        motif_classified_pks_ttest(
+            distal_pk, motifscan_result, correction_type=correction_type, negative=neg)
+
+
+def test():
+    from constant import hg19_refgenes_file
+    os.chdir('F:\\MAmotif\\0. MAmotif_used_data\\H3K27ac_H1hesc_VS_K562')
+    run_MAmotif_pipeline('H1hesc_H3K27ac_Broad_Rep2_peak_MAvalues.xls',
+                         'H3K27ac_H1hesc_Rep2_peak_result',
+                         hg19_refgenes_file)
+
+
+def command():
+    opt_parser = OptionParser()
+    opt_parser.add_option('-p', dest='pk', help='MAnorm comparison peak file path')
+    opt_parser.add_option('-r', dest='refgene', default='', help='refgene file, default is none.')
+    opt_parser.add_option('-M', dest='motif', help='motifscan result file path')
+    opt_parser.add_option('-n', dest='negative', action='store_true', default=False,
+                          help='Using negative test of this pk')
+    opt_parser.add_option('-c', dest='correction', default='benjamin',
+                          help='correction type of pvalues, no correction or benjamin or bonferroni,'
+                               'default=benjamin')
+    opt_parser.add_option('-d', dest='nfd', action='store_true', default=False,
+                          help='Not create MAnorm comparison folder')
+    options, args = opt_parser.parse_args()
+    pk = options.pk
+    refgene = options.refgene
+    motif = options.motif
+    negative = options.negative
+    correction = options.correction
+    fd = options.nfd
+    run_MAmotif_pipeline(pk, motif, refgene, correction_type=correction, neg=negative, no_fd=fd)
+
+
+if __name__ == '__main__':
+    # test()
+    command()
