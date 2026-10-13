@@ -42,7 +42,7 @@ def generate_a_random_seq(seq, genome='hg19'):
         random_seq = Sequence(seq.chrm, random_start, random_end)
         return random_seq
     else:
-        print 'sorry, 暂时还只支持hg19的基因组序列。'
+        print('sorry, 暂时还只支持hg19的基因组序列。')
 
 
 def generate_a_chromosome_seqs(seqs_chrm, chrm, genome='hg19'):
@@ -50,7 +50,7 @@ def generate_a_chromosome_seqs(seqs_chrm, chrm, genome='hg19'):
     如果给定的序列都来自同一条染色体调用这个方法来生成对应的随机序列
     """
     if genome != 'hg19':
-        print 'sorry, 暂时还只支持hg19的基因组序列。'
+        print('sorry, 暂时还只支持hg19的基因组序列。')
         exit()
     chrlen = hg19_chrlen[chrm]
     seqs_chrm_length = np.array([seq.length for seq in seqs_chrm])
@@ -70,7 +70,7 @@ def generate_a_group_random_seqs(seqs, genome='hg19'):
     @return: 随机生成的序列组
     """
     if genome != 'hg19':
-        print 'sorry, 暂时还只支持hg19的基因组序列。'
+        print('sorry, 暂时还只支持hg19的基因组序列。')
         exit()
     # random_seqs = [generate_a_random_seq(seq) for seq in seqs]  # 通过调用generate_a_random_seq一条条生成随机序列
     # 用Sequences封装seqs列表，然后按照染色体进行分组
@@ -96,11 +96,11 @@ if __name__ == '__main__':
     # ---------------- test ----------------------------------------
     from MAmotif_pkg import *
     import time, os
-    start = time.clock()
+    start = time.perf_counter()
     peaks = read_MAnorm_peaks(os.sep.join(['test_data', 'H1hesc_H3K27ac_Broad_Rep2_promoter_peak_MAvalues.xls']))
     random_seqs = generate_a_group_random_seqs(peaks)
-    print '随机序列组的大小：%d' % len(random_seqs)
-    print '消耗时间：%s' % str(time.clock() - start)
+    print('随机序列组的大小：%d' % len(random_seqs))
+    print('消耗时间：%s' % str(time.perf_counter() - start))
     # ---------------------------------------------------------------------
     # result:
     # 随机序列组的大小：10131

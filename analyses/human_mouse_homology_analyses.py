@@ -20,9 +20,9 @@ def do_homology_mapping(homology_file):
         i += 1
         map_res[human_transcript_id] = mouse_transcript_id
         # map_res[mouse_transcript_id] = human_transcript_id
-    print 'total homology gene pairs: %d' % i
+    print('total homology gene pairs: %d' % i)
     handle.close()
-    # import cPickle as pkl
+    # import pickle as pkl
     # pkl.dump(map_res, open('human_mouse_homology_mapping_result.pkl', 'wb'))
     return map_res
 
@@ -36,9 +36,9 @@ def fisher_exact_test(human_gene_list, mouse_gene_list, motif_human_genes, motif
     overlap = human.intersection(mouse)
     motif_human = read_gene_set(motif_human_genes)
     motif_human = set([map_res[h] for h in motif_human if h in map_res.keys()])
-    print motif_human
+    print(motif_human)
     motif_mouse = read_gene_set(motif_mouse_genes)
-    print motif_mouse
+    print(motif_mouse)
     motif_overlap = motif_human.intersection(motif_mouse)
     # table
     m11 = len(list(motif_overlap))
@@ -46,10 +46,10 @@ def fisher_exact_test(human_gene_list, mouse_gene_list, motif_human_genes, motif
     m21 = len(list(motif_human)) - len(list(motif_overlap))
     m22 = len(human) - len(motif_overlap)
     table = [[m11, m12], [m21, m22]]
-    print table
+    print(table)
     enrichment_score = 1.0 * len(motif_overlap) / (len(overlap) * len(overlap) / len(human))
     odd_ratio, pvalue = fisher_exact(table)
-    print '%f\t%f\t%s\n' % (enrichment_score, odd_ratio, str(pvalue))
+    print('%f\t%f\t%s\n' % (enrichment_score, odd_ratio, str(pvalue)))
     return enrichment_score, pvalue
 
 
@@ -61,13 +61,13 @@ def fisher_exact_test2(bk_human_pk, motifscan_human, refgene_human,
     """
     map_res = do_homology_mapping(homology_file)
     human, motifs_human = get_motifs_target_genes(bk_human_pk, motifscan_human, refgene_human)
-    print 'mouse gene number: %d' % len(human)
+    print('mouse gene number: %d' % len(human))
     human = set([map_res[h] for h in human if h in map_res.keys()])
     mouse, motifs_mouse = get_motifs_target_genes(bk_mouse_pk, motifscan_mouse, refgene_mouse)
     overlap = human.intersection(mouse)
-    print '%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s' % \
+    print('%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s' %
           ('motif name', 'human', 'human_mouse_overlap', 'motif_human', 'motif_human_mouse_overlap',
-           'enrichment score', 'odd ratio', 'p-value')
+           'enrichment score', 'odd ratio', 'p-value'))
     for motif in motifs:
         motif_human = set([map_res[h] for h in motifs_human[motif] if h in map_res.keys()])
         # motif_mouse = motifs_mouse[motif]
@@ -84,9 +84,9 @@ def fisher_exact_test2(bk_human_pk, motifscan_human, refgene_human,
         else:
             enrichment_score = 1.0 * len(motif_overlap) / (1.0 * len(motif_human) * len(overlap) / len(human))
         odd_ratio, pvalue = fisher_exact(table, alternative='greater')
-        print '%s\t%d\t%d\t%d\t%d\t%s\t%f\t%s' % \
+        print('%s\t%d\t%d\t%d\t%d\t%s\t%f\t%s' %
               (motif, len(human), len(overlap), len(motif_human), len(motif_overlap),
-               str(enrichment_score), odd_ratio, str(pvalue))
+               str(enrichment_score), odd_ratio, str(pvalue)))
         pass
 
 

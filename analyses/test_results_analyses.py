@@ -19,8 +19,8 @@ def get_significant_motifs(test_result_file, min_pvalue=1.):
             try:
                 if float(bonferroni_pvalue) < min_pvalue:
                     significant_motifs.append(line.strip().split()[0])
-            except ValueError, e:
-                print e
+            except ValueError as e:
+                print(e)
                 continue
     return significant_motifs
 
@@ -32,8 +32,8 @@ def stats_test_result(test_result_folder):
         cutted_motifs += get_significant_motifs(fi_path, min_pvalue=0.001)
     cutted_motifs = np.array(cutted_motifs)
     for motif in list(set(cutted_motifs)):
-        print '%s: ' % motif,
-        print '%d' % cutted_motifs[cutted_motifs == motif].size
+        print('%s: ' % motif, end=' ')
+        print('%d' % cutted_motifs[cutted_motifs == motif].size)
 
 
 def get_overlap_motifs(mvalue_test_file, fold_change_test_file):
@@ -63,8 +63,8 @@ def show_one_motif_test_result(folder_of_comparisons, test_file_name, motif_name
             try:
                 file_path = os.sep.join([folder_of_comparisons, comp_f, test_file_name])
                 hd = open(file_path)
-            except IOError, e:
-                print e
+            except IOError as e:
+                print(e)
                 continue
             for rec in hd:
                 if i == 1:
@@ -93,8 +93,8 @@ def show_one_motif_fisher_test_result(folder_of_comparisons, test_file_name, mot
             try:
                 file_path = os.sep.join([folder_of_comparisons, comp_f, test_file_name])
                 hd = open(file_path)
-            except IOError, e:
-                print e
+            except IOError as e:
+                print(e)
                 continue
             for rec in hd:
                 if i == 1:

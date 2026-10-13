@@ -47,7 +47,7 @@ class IDMap(object):  # 用于将某基因芯片平台的探针id和refseq trans
         with open(fp) as fi:
             for line in fi:
                 if line.startswith('ID') or line.startswith('#'):
-                    print line
+                    print(line)
                     continue
                 cnt = line.strip().split('\t')
                 gpl_id = cnt[0].strip()
@@ -85,7 +85,7 @@ def get_refgenes_expression_value(sample_fp, gpl_map_id_fp):
                     new_sample[refseq_id] = []
                     new_sample[refseq_id].append(rec.value)
         except KeyError:
-            print '这个探针%s在id映射表里面没有找到！' % rec.gpl_id
+            print('这个探针%s在id映射表里面没有找到！' % rec.gpl_id)
 
     fw = open(sample_fp.replace('.txt', '_refseq.txt'), 'w')
     for key in sorted(new_sample.keys()):
@@ -94,7 +94,7 @@ def get_refgenes_expression_value(sample_fp, gpl_map_id_fp):
         fw.write(line)
         # print np.array(new_sample[key]).mean()
         # print new_sample[key]
-        # raw_input('暂停一下')
+        # input('暂停一下')
 
 
 def get_de_genes(gene_de_file, output_fn, log2fc=1.):
@@ -113,7 +113,7 @@ def get_de_genes(gene_de_file, output_fn, log2fc=1.):
                 if float(cnt[1]) < log2fc:
                     fo.write(cnt[0] + '\n')
             else:
-                print 'The log2(FC) value is wrong!'
+                print('The log2(FC) value is wrong!')
 
 
 def test_get_refgenes_expression_value():

@@ -1,19 +1,19 @@
+#!/usr/bin/env python3
+# coding=utf-8
+"""Fisher exact test of motif target genes vs differentially expressed genes."""
+import argparse
+
 from import_MAmotif import motif_targenes_de_fisher_test
 
 
-def command():
-    from optparse import OptionParser
-    optparser = OptionParser()
-    optparser.add_option('-p', dest='pk', help='MAnorm peak file path')
-    optparser.add_option('-M', dest='ms', help='Motifscan target number file path')
-    optparser.add_option('-r', dest='ref', help='RefSeq gene file path')
-    optparser.add_option('-d', dest='de', help='Different expression gene list file path')
-    options, args = optparser.parse_args()
-    pk = options.pk
-    ms = options.ms
-    ref = options.ref
-    de = options.de
-    motif_targenes_de_fisher_test(pk, ms, de, ref)
+def command(argv=None):
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('-p', dest='pk', required=True, help='MAnorm peak file path')
+    parser.add_argument('-M', dest='ms', required=True, help='MotifScan result file path')
+    parser.add_argument('-r', dest='ref', required=True, help='RefSeq gene file path')
+    parser.add_argument('-d', dest='de', required=True, help='Differentially expressed gene list')
+    options = parser.parse_args(argv)
+    motif_targenes_de_fisher_test(options.pk, options.ms, options.de, options.ref)
 
 
 if __name__ == '__main__':

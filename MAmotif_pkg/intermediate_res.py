@@ -1,96 +1,68 @@
+"""Serialize / deserialize intermediate MAmotif objects with pickle."""
+from __future__ import annotations
+
+import pickle
+
+
 def save_classifier(classifier, file_name):
-        """
-        save classifier result into a file
-        @param file_name:
-        """
-        import cPickle
-        if not file_name.endswith('.classifier'):
-            cPickle.dump(classifier, file(file_name + '.classifier', 'wb'), True)
-        else:
-            cPickle.dump(classifier, file(file_name, 'wb'), True)
+    """Save classifier result into a file."""
+    path = file_name if file_name.endswith('.classifier') else file_name + '.classifier'
+    with open(path, 'wb') as handle:
+        pickle.dump(classifier, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
 
 def read_classifier(file_path):
-    """
-    read a classifier result from file
-    """
-    import cPickle
-    if file_path.endswith('.classifier'):
-        cls = cPickle.load(file(file_path, 'rb'))
-        return cls
-    else:
-        print 'This file is not a classifier file!'
+    """Read a classifier result from file."""
+    if not file_path.endswith('.classifier'):
+        print('This file is not a classifier file!')
+        return None
+    with open(file_path, 'rb') as handle:
+        return pickle.load(handle)
 
 
 def save_PeakSet(pkset, file_name):
-    """
-    save peak set into a file
-    @param pkset: instance of GESet
-    @param file_name: file name for saving
-    """
-    import cPickle
-    if not file_name.endswith('.PeakSet'):
-        cPickle.dump(pkset, file(file_name + '.PeakSet', 'wb'), True)
-    else:
-        cPickle.dump(pkset, file(file_name, 'wb'), True)
+    """Save peak set into a file."""
+    path = file_name if file_name.endswith('.PeakSet') else file_name + '.PeakSet'
+    with open(path, 'wb') as handle:
+        pickle.dump(pkset, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
 
 def read_PeakSet(file_path):
-    """
-    read PeakSet from file
-    """
-    import cPickle
-    if file_path.endswith('.PeakSet'):
-        pkset = cPickle.load(file(file_path, 'rb'))
-        return pkset
-    else:
-        print 'This file is not a PeakSet file!'
+    """Read PeakSet from file."""
+    if not file_path.endswith('.PeakSet'):
+        print('This file is not a PeakSet file!')
+        return None
+    with open(file_path, 'rb') as handle:
+        return pickle.load(handle)
 
 
 def save_GESet(geset, file_name):
-    """
-    save gene expression set data into a file
-    @param geset: instance of GESet
-    @param file_name: file name for saving
-    """
-    import cPickle
-    if not file_name.endswith('.GESet'):
-        cPickle.dump(geset, file(file_name + '.GESet', 'wb'), True)
-    else:
-        cPickle.dump(geset, file(file_name, 'wb'), True)
+    """Save gene expression set data into a file."""
+    path = file_name if file_name.endswith('.GESet') else file_name + '.GESet'
+    with open(path, 'wb') as handle:
+        pickle.dump(geset, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
 
 def read_GESet(file_path):
-    """
-    read GESet from file
-    """
-    import cPickle
-    if file_path.endswith('.GESet'):
-        geset = cPickle.load(file(file_path, 'rb'))
-        return geset
-    else:
-        print 'This file is not a GESet file!'
+    """Read GESet from file."""
+    if not file_path.endswith('.GESet'):
+        print('This file is not a GESet file!')
+        return None
+    with open(file_path, 'rb') as handle:
+        return pickle.load(handle)
 
 
 def save_GeneSet(geneset, file_name):
-    """
-    saving gene set
-    @param file_path:
-    """
-    import cPickle
-    if not file_name.endswith('.GeneSet'):
-        cPickle.dump(geneset, file(file_name + '.GeneSet', 'wb'), True)
-    else:
-        cPickle.dump(geneset, file(file_name, 'wb'), True)
+    """Save gene set."""
+    path = file_name if file_name.endswith('.GeneSet') else file_name + '.GeneSet'
+    with open(path, 'wb') as handle:
+        pickle.dump(geneset, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
 
 def read_GeneSet(file_path):
-    """
-    read GeneSet from file
-    """
-    import cPickle
-    if file_path.endswith('.GeneSet'):
-        geneset = cPickle.load(file(file_path, 'rb'))
-        return geneset
-    else:
-        print 'This file is not a GeneSet file!'
+    """Read GeneSet from file."""
+    if not file_path.endswith('.GeneSet'):
+        print('This file is not a GeneSet file!')
+        return None
+    with open(file_path, 'rb') as handle:
+        return pickle.load(handle)

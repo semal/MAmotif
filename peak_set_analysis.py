@@ -71,13 +71,13 @@ def output_group_peaks_overlap_situation(key_pk_fp, inspect_pk_fdp, log2_m_cut=0
     if log2_m_cut != 0:
         key_pks = [p for p in key_pks if p.mvalue > log2_m_cut]
     key_fn = os.path.basename(key_pk_fp)
-    print '%s(%d)' % (key_fn, len(key_pks)),
+    print('%s(%d)' % (key_fn, len(key_pks)), end=' ')
     for fn in os.listdir(inspect_pk_fdp):
         # print fn
         inspect_pk_fp = os.sep.join([inspect_pk_fdp, fn])
         key_overlap_num, inspect_overlap_num = cal_overlap_num(key_pk_fp, inspect_pk_fp, log2_m_cut)
-        print '\t(%d, %d)' % (key_overlap_num, inspect_overlap_num),
-    print '\n',
+        print('\t(%d, %d)' % (key_overlap_num, inspect_overlap_num), end=' ')
+    print('\n', end=' ')
 
 
 def output_2group_peaks_overlap_situation(key_pk_fdp, inspect_pk_fdp, log2_m_cut=0.):
@@ -85,7 +85,7 @@ def output_2group_peaks_overlap_situation(key_pk_fdp, inspect_pk_fdp, log2_m_cut
     看两个文件夹内的peak文件之间的重叠情况
     """
     fn_list = os.listdir(inspect_pk_fdp)
-    print '\t%s' % '\t'.join(fn_list)
+    print('\t%s' % '\t'.join(fn_list))
     for fn in os.listdir(key_pk_fdp):
         key_pk_fp = os.sep.join([key_pk_fdp, fn])
         output_group_peaks_overlap_situation(key_pk_fp, inspect_pk_fdp, log2_m_cut)
@@ -101,8 +101,8 @@ def cal_peaks_enrichment(peak_fp, key_peak_fp, simulate_times=1000):
     @return:
     """
 
-    print '参考组文件：%s' % peak_fp
-    print '给定组文件：%s' % key_peak_fp
+    print('参考组文件：%s' % peak_fp)
+    print('给定组文件：%s' % key_peak_fp)
 
     peaks = read_MAnorm_peaks(peak_fp)
     peakset = MAnormPeakSet()
@@ -114,8 +114,8 @@ def cal_peaks_enrichment(peak_fp, key_peak_fp, simulate_times=1000):
     key_seqs.set_sequences(key_peaks)
     group_key_seqs = key_seqs.group_by_chromosomes()
 
-    print '参考组peak的数目：%d' % len(peaks)
-    print '给定组peak的数目：%d' % len(key_peaks)
+    print('参考组peak的数目：%d' % len(peaks))
+    print('给定组peak的数目：%d' % len(key_peaks))
 
     num_overlap = 0
     for chrm in group_key_seqs.keys():
@@ -123,7 +123,7 @@ def cal_peaks_enrichment(peak_fp, key_peak_fp, simulate_times=1000):
             num_overlap += 0
             continue
         num_overlap += get_overlap_num_in_one_chromosome(group_peaks[chrm], group_key_seqs[chrm])[0]
-    print '观测到的overlap个数：%d' % num_overlap  # num_overlap是观测到的结果
+    print('观测到的overlap个数：%d' % num_overlap) # num_overlap是观测到的结果
 
     num_simulate_overlap = 0
     over_times = 0  # 模拟结果中出现overlap数目大于观测结果的次数
@@ -143,9 +143,9 @@ def cal_peaks_enrichment(peak_fp, key_peak_fp, simulate_times=1000):
         if temp >= num_overlap:
             over_times += 1
     num_simulate_overlap /= simulate_times
-    print '\n'
-    print '随机模拟overlap的个数：%d' % num_simulate_overlap
-    print '随机模拟%d次，出现超过观测值%d的数目：%d\n\n' % (simulate_times, num_overlap, over_times)
+    print('\n')
+    print('随机模拟overlap的个数：%d' % num_simulate_overlap)
+    print('随机模拟%d次，出现超过观测值%d的数目：%d\n\n' % (simulate_times, num_overlap, over_times))
 
 
 def get_all_overlap_num(bk_peaks_fp, motif_peaks_fdp, tf_peaks_fdp):
@@ -156,7 +156,7 @@ def get_all_overlap_num(bk_peaks_fp, motif_peaks_fdp, tf_peaks_fdp):
     bk_peaks_set = MAnormPeakSet()
     bk_peaks_set.set_sequences(bk_peaks)
     # group_bk_peaks = bk_peaks_set.group_by_chromosomes()
-    print '背景组(%s)peaks的数目是：%d' % (bk_peaks_fp, bk_peaks_set.size)
+    print('背景组(%s)peaks的数目是：%d' % (bk_peaks_fp, bk_peaks_set.size))
 
     motifs_peak_num = []
     for motif_file in os.listdir(motif_peaks_fdp):
@@ -166,7 +166,7 @@ def get_all_overlap_num(bk_peaks_fp, motif_peaks_fdp, tf_peaks_fdp):
     first_line = \
         '\t'.join(['%s(%d)' % (name[:-4], num) for name, num in
                    zip(os.listdir(motif_peaks_fdp), motifs_peak_num)])
-    print '\t%s' % first_line
+    print('\t%s' % first_line)
 
     for tf_file in os.listdir(tf_peaks_fdp):
         tf_file_path = os.sep.join([tf_peaks_fdp, tf_file])
@@ -178,7 +178,7 @@ def get_all_overlap_num(bk_peaks_fp, motif_peaks_fdp, tf_peaks_fdp):
             __cal_overlap_num(bk_peaks_set, tf_peaks_set)  # tf peaks与背景组peaks的重叠数目
         # bk_overlap_num = cal_overlap_num(group_tf_peaks, group_bk_peaks)  # tf peaks与背景组peaks的重叠数目
         # print '与背景的overlap数：%d' % bk_overlap_num
-        print '%s:%d/%d' % (tf_file.split('.')[0], tf_overlap_num, tf_peaks_set.size),
+        print('%s:%d/%d' % (tf_file.split('.')[0], tf_overlap_num, tf_peaks_set.size), end=' ')
 
         for motif_file in os.listdir(motif_peaks_fdp):
             motif_file_path = os.sep.join([motif_peaks_fdp, motif_file])
@@ -202,13 +202,13 @@ def get_all_overlap_num(bk_peaks_fp, motif_peaks_fdp, tf_peaks_fdp):
             try:
                 enrichment_score = \
                     1. * overlap_num / (tf_overlap_num * motif_overlap_num / bk_peaks_set.size)
-                print '\t%.7f,%s,%d' % (enrichment_score, str(pvalue), overlap_num),
+                print('\t%.7f,%s,%d' % (enrichment_score, str(pvalue), overlap_num), end=' ')
                 # print '\t%.7f' % enrichment_score,
             except ZeroDivisionError:
                 enrichment_score = '1'
-                print '\t%s,%s,%d' % (enrichment_score, str(pvalue), overlap_num),
+                print('\t%s,%s,%d' % (enrichment_score, str(pvalue), overlap_num), end=' ')
                 # print '\t%s' % enrichment_score,
-        print '\n',
+        print('\n', end=' ')
 
 
 def test_output_two_group_peaks_overlap_situation():

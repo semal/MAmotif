@@ -86,7 +86,7 @@ def motifs_classified_peaks_targenes_ttest(peak_fp, refgene_fp, genes_fc_fp, mot
         line += '{0:d}\t{1:f}\t{2:f}\t'.format(yes.size, yes.mean(), yes.std())
         line += '{0:d}\t{1:f}\t{2:f}\t'.format(no.size, no.mean(), no.std())
         lines.append(line)
-        print line
+        print(line)
         ttest = do_ttest(yes, no)
         ttest_result.append(ttest)
         rtest = do_ranksum_test(yes, no)
@@ -112,32 +112,20 @@ def motifs_classified_peaks_targenes_ttest(peak_fp, refgene_fp, genes_fc_fp, mot
         test_result.write(line)
 
 
-def command():
-    from optparse import OptionParser
+def command(argv=None):
+    import argparse
 
-    opt_parser = OptionParser()
-    opt_parser.add_option('-p', dest='pk', help='cell to cell peak file path')
-    opt_parser.add_option('-r', dest='refgene', help='refgene file')
-    opt_parser.add_option('-f', dest='fold_change', help='cell to cell log2 fold change')
-    opt_parser.add_option('-m', dest='motif', help='motifscan result file path')
-    options, args = opt_parser.parse_args()
-    pk = options.pk
-    refgene = options.refgene
-    fold_change = options.fold_change
-    motif = options.motif
-    motifs_classified_peaks_targenes_ttest(pk, refgene, fold_change, motif)
-    print 'Done!'
-
-
-def test_motifs_classified_peaks_targenes_ttest():
-    from constant import manorm_peak_file as pk
-    from constant import hg19_refgenes_file as ref
-    from constant import gene_fold_change_file as fc
-    from constant import motifscan_file as ms
-    motifs_classified_peaks_targenes_ttest(pk, ref, fc, ms)
+    parser = argparse.ArgumentParser(
+        description='Test expression changes of motif-classified peak target genes.')
+    parser.add_argument('-p', dest='pk', required=True, help='cell to cell peak file path')
+    parser.add_argument('-r', dest='refgene', required=True, help='refgene file')
+    parser.add_argument('-f', dest='fold_change', required=True, help='cell to cell log2 fold change')
+    parser.add_argument('-m', dest='motif', required=True, help='motifscan result file path')
+    options = parser.parse_args(argv)
+    motifs_classified_peaks_targenes_ttest(
+        options.pk, options.refgene, options.fold_change, options.motif)
+    print('Done!')
 
 
 if __name__ == '__main__':
-    # command()
-    test_motifs_classified_peaks_targenes_ttest()
-    pass
+    command()

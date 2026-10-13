@@ -76,7 +76,7 @@ class RefSeqTools(object):
     def __get_reads_pos(self, reads_file):
         uniq_chrs = list(set([ref_gene.chrom for ref_gene in self.ref_genes]))
         read_starts = {key.lower(): [] for key in uniq_chrs}
-        print 'reading %s reads ...' % reads_file
+        print('reading %s reads ...' % reads_file)
         file = open(reads_file)
         first_line_cnt = file.readline().strip().split()
 
@@ -89,7 +89,7 @@ class RefSeqTools(object):
 
         for chrm in uniq_chrs:
             read_starts[chrm] = np.sort(np.array(read_starts[chrm]))
-            print '%s: %d' % (chrm, read_starts[chrm].size)
+            print('%s: %d' % (chrm, read_starts[chrm].size))
         return read_starts
 
     def map_reads_2genes(self, reads_file):
@@ -103,7 +103,7 @@ class RefSeqTools(object):
         for ref_gene in self.ref_genes:
             times += 1
             if times % 500 == 0:
-                print 'calculated %d genes read count ...' % times
+                print('calculated %d genes read count ...' % times)
             if len(read_starts[ref_gene.chrom]) == 0:
                 continue
             starts = read_starts[ref_gene.chrom]
@@ -112,14 +112,14 @@ class RefSeqTools(object):
                 rd = cal_read_count(es, ed, starts)
                 ref_gene.read_count += rd
 
-        print 'start calculate rpkm ...'
+        print('start calculate rpkm ...')
         mapped_read_count = self.mapped_read_count
         for ref_gene in self.ref_genes:
             # calculate RPKM
             ref_gene.read_density = \
                 ref_gene.read_count * 1000 * 1000 * 1000. / (ref_gene.mRNA_length * mapped_read_count)
-        print 'got reads time: %f' % (time() - start1)
-        print 'map reads time: %f' % (time() - start2)
+        print('got reads time: %f' % (time() - start1))
+        print('map reads time: %f' % (time() - start2))
 
     @property
     def mapped_read_count(self):

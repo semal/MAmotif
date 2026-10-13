@@ -61,12 +61,12 @@ def violin_viewer(pk_file, motifscan_file, motif_pos, limit_pvalue=0.001, neg=Fa
         yes = pk_array[numpy.where(tarnum_dict[motif] > 0)[0]]
         no = pk_array[numpy.where(tarnum_dict[motif] == 0)[0]]
         if motif in motif_pos:
-            print motif
+            print(motif)
             mvalue_yes, mvalue_no = [pk.mvalue for pk in yes], [pk.mvalue for pk in no]
             data1[motif] = mvalue_yes
             data2[motif] = mvalue_no
-            print 'yes length: %d' % len(mvalue_yes)
-            print 'no length: %d' % len(mvalue_no)
+            print('yes length: %d' % len(mvalue_yes))
+            print('no length: %d' % len(mvalue_no))
 
     plt.figure(figsize=(12, 4))
     plt.tick_params(width=2, labelsize=15)

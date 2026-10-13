@@ -37,7 +37,7 @@ def test_read_fold_change_file():
     from constant import gene_fold_change_file
     tt = read_fold_change_file(gene_fold_change_file)
     for key in tt.keys():
-        print '%s: %f' % (key, tt[key])
+        print('%s: %f' % (key, tt[key]))
 
 
 if __name__ == '__main__':
