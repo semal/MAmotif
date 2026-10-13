@@ -19,6 +19,15 @@ pytest
 mamotif -h
 ```
 
+## MotifScan pickle 说明
+
+MotifScan 的 pandas pickle 若由 **Python 2** 写出，在 Python 3 下可能无法直接 `read_pickle`。建议：
+
+1. 用当前 Python 3 环境重新跑 MotifScan 生成结果；或
+2. 在仍可用的 Py2 环境中读入后以协议 2+ / 兼容格式导出，再在 Py3 中加载。
+
+MATLAB `.mat` MotifScan 结果不受此限制。
+
 ## 未改动的部分
 
 - 生物学算法与输出列含义保持原设计

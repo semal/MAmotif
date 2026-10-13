@@ -1,5 +1,10 @@
 # coding=utf-8
 # 在做富集分析的时候通常要在各种背景下模拟随机情况下的序列位置，这个脚本提供各种模拟的方法
+import random
+
+import numpy as np
+
+from .sequence import Sequence, Sequences
 
 
 # ENCODE(UCSC) each chromosomes length, 此字典的keys统一用小写

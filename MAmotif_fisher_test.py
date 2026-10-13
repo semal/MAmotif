@@ -1,6 +1,6 @@
 # coding=utf-8
 # 富集分析相关
-from scipy.stats.stats import fisher_exact
+from scipy.stats import fisher_exact
 import os
 from MAmotif_pkg import *
 from gene_set_analysis import make_2geneset_fisher_exact_test, get_fisher_table, cal_enrich_score

@@ -115,6 +115,21 @@ def test_constant_paths():
     assert len(motifs) == 196
 
 
+def test_midpoint_is_int():
+    pk = MAnormPeak('chr1', 100, 201, summit=50)
+    assert pk.midpoint == 150
+    assert isinstance(pk.midpoint, int)
+
+
+def test_sequence_permutation_imports():
+    from MAmotif_pkg.sequence_permutation import generate_a_random_seq, hg19_chrlen
+    assert 'chr1' in hg19_chrlen
+    seq = _peak_with_m('chr1', 1000, 1100, 1.0)
+    rnd = generate_a_random_seq(seq)
+    assert rnd.chrm == 'chr1'
+    assert rnd.length == seq.length
+
+
 def _peak_with_m(chrm, start, end, mvalue):
     pk = MAnormPeak(chrm, start, end, summit=(end - start) // 2)
     pk.set_mvalue(mvalue)

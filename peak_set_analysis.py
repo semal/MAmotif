@@ -1,5 +1,7 @@
 # coding=utf-8
 # peaks（蛋白结合区域）之间的分析是很重要的一环
+import sys
+
 from scipy.stats import fisher_exact
 from MAmotif_pkg import *
 
@@ -129,7 +131,7 @@ def cal_peaks_enrichment(peak_fp, key_peak_fp, simulate_times=1000):
     over_times = 0  # 模拟结果中出现overlap数目大于观测结果的次数
     for i in range(simulate_times):
         temp = 0  # 记录一次模拟中overlap的序列个数
-        os.write(1, '\rsimulate_time: %d / %d' % (i + 1, simulate_times))
+        sys.stdout.write('\rsimulate_time: %d / %d' % (i + 1, simulate_times))
         for chrm in group_key_seqs.keys():
             if chrm not in hg19_chrlen.keys():
                 continue

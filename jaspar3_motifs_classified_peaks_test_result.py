@@ -4,6 +4,8 @@
 # 观察到的结果就应该是有显著的差异（p值很小）
 from optparse import OptionParser
 import os
+import sys
+
 import numpy
 from MAmotif_pkg import *
 from jaspar3 import jaspar3_name, read_motifscan_result
@@ -37,7 +39,7 @@ def get_jaspar3_target_number_list(pk_file, motifscan_result, motifs=jaspar3_nam
         for mp in motifscan_pks:
             if pk == mp:
                 match_num += 1
-                os.write(1, '\r%d/%d' % (match_num, pk_num))
+                sys.stdout.write('\r%d/%d' % (match_num, pk_num))
                 tarnum_list.append(mp.target_number)
                 match = True
                 break

@@ -121,13 +121,17 @@ def trim_read_count_files(human_read_count_file, mouse_read_count_file, homology
     human, human_header = get_read_count_info(human_read_count_file)
     mouse, mouse_header = get_read_count_info(mouse_read_count_file)
     map_res = do_homology_mapping(homology_file)
-    homology_human_genes = map_res.keys()
-    homology_mouse_genes = map_res.values()
+    homology_human_genes = list(map_res.keys())
+    homology_mouse_genes = list(map_res.values())
     # 去除那些不存于同源基因数据库的基因
-    [human.pop(key) for key in human.keys() if key not in homology_human_genes]
-    [mouse.pop(key) for key in mouse.keys() if key not in homology_mouse_genes]
+    for key in list(human.keys()):
+        if key not in homology_human_genes:
+            human.pop(key)
+    for key in list(mouse.keys()):
+        if key not in homology_mouse_genes:
+            mouse.pop(key)
     # 将人的基因名替换成老鼠的基因名
-    for key in human.keys():
+    for key in list(human.keys()):
         human[map_res[key]] = human.pop(key)
     # 找人和老鼠之间都出现的那部分基因
     human_genes = set(human.keys())

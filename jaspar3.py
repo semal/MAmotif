@@ -215,7 +215,7 @@ def read_motifscan_result(motifscan_result, motifs=jaspar3_name):
     row_num = motifscan.shape[0]
     for k, v in motifscan.iterrows():
         i += 1
-        os.write(1, '\r%d/%d' % (i, row_num))
+        sys.stdout.write('\r%d/%d' % (i, row_num))
         motifscan_peak = MotifScanPeak(v['chr'], int(v['start']), int(v['end']), int(v['summit']))
         target_number_list = []
         for name in motifs:

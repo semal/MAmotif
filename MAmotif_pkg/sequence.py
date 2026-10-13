@@ -68,7 +68,7 @@ class Sequence(object):
         """
         @return: midpoint of sequence
         """
-        return (self.__end + self.__start) / 2
+        return (self.__end + self.__start) // 2
 
     def prints(self):
         """

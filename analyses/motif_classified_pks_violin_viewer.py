@@ -2,7 +2,7 @@
 import os
 import numpy
 from scipy.stats import gaussian_kde
-import pylab as plt
+import matplotlib.pyplot as plt
 
 from import_MAmotif import match_manorm_with_motifscan
 

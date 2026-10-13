@@ -209,7 +209,7 @@ def read_motifscan_result(motifscan_result):
     row_num = motifscan.shape[0]
     for k, v in motifscan.iterrows():
         i += 1
-        os.write(1, '\r%d/%d' % (i, row_num))
+        sys.stdout.write('\r%d/%d' % (i, row_num))
         motifscan_peak = MotifScanPeak(v['chr'], int(v['start']), int(v['end']), int(v['summit']))
         target_number_list = [int(v[name + '.tarnum']) for name in motifs]
         motifscan_peak.set_motif_info(motifs, target_number_list)
@@ -288,7 +288,7 @@ def output_peaks_target_genes(pk_fp, refgene_fp):
         i += 1
         tar_genes += ref_genes.find_target_gene(pk)
         # print '\r%d / %d' % (i, len(pks))
-        os.write(1, '\r%d / %d' % (i, len(pks)))
+        sys.stdout.write('\r%d / %d' % (i, len(pks)))
         sys.stdout.flush()
     print('\n')
     # save gene list
