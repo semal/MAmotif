@@ -5,10 +5,10 @@ import pandas as pd
 import numpy as np
 import sys
 
-from MAmotifPeaks import MAnormPeak, MotifScanPeak, MAnormPeakSet
-from MAnormPeaksClassifier import FeaturePvalue, MAnormPeaksClassifier, FeatureMotif, FeaturePromoter, \
+from .MAmotifPeaks import MAnormPeak, MotifScanPeak, MAnormPeakSet
+from .MAnormPeaksClassifier import FeaturePvalue, MAnormPeaksClassifier, FeatureMotif, FeaturePromoter, \
     FeatureOtherPeakOverlap, Feature
-from sequence import Gene, Peak, Sequence, GeneSet
+from .sequence import Gene, Peak, Sequence, GeneSet
 
 
 def coarse(num, keli):
@@ -140,7 +140,7 @@ def read_motifscan_peaks(motifscan_file_path, motif_name):
             if name.lower() == motif_name.lower():
                 index = i
                 break
-        for i in xrange(len(mat['chr_id'][0][0])):
+        for i in range(len(mat['chr_id'][0][0])):
             chrm = mat['chr_id'][0][0][i][0][0]
             start = mat['bpstart'][0][0][i][0]
             end = mat['bpend'][0][0][i][0]
@@ -201,7 +201,7 @@ def read_motifscan_result(motifscan_result):
     @param motifscan_result: motifscan result from Wangjiawei's peak result file
     @return: motifscan_peak_list, motifs
     """
-    print 'reading motifscan result: %s, start!' % motifscan_result.split(os.sep)[-1]
+    print('reading motifscan result: %s, start!' % motifscan_result.split(os.sep)[-1])
     motifscan = pd.read_pickle(motifscan_result)  # from Wang Jiawei MotifScan result
     motifs = get_motif_names(motifscan)
     motifscan_peak_list = []
@@ -209,14 +209,14 @@ def read_motifscan_result(motifscan_result):
     row_num = motifscan.shape[0]
     for k, v in motifscan.iterrows():
         i += 1
-        os.write(1, '\r%d/%d' % (i, row_num))
+        sys.stdout.write('\r%d/%d' % (i, row_num))
         motifscan_peak = MotifScanPeak(v['chr'], int(v['start']), int(v['end']), int(v['summit']))
         target_number_list = [int(v[name + '.tarnum']) for name in motifs]
         motifscan_peak.set_motif_info(motifs, target_number_list)
         # print motifscan_peak.target_number
         motifscan_peak_list.append(motifscan_peak)
         sys.stdout.flush()
-    print '\nend!'
+    print('\nend!')
     return motifscan_peak_list, motifs
 
 
@@ -234,13 +234,13 @@ def match_manorm_with_motifscan(pk_file, motifscan_result, neg_mvalue=False):
     """
     # read MAnorm peaks
     manorm_pks = read_MAnorm_peaks(pk_file, neg_mvalue)
-    print 'MAnorm peaks num: %d' % len(manorm_pks)
+    print('MAnorm peaks num: %d' % len(manorm_pks))
 
     # read motifscan result
     motifscan_pks, motifs = read_motifscan_result(motifscan_result)
 
     # matching ...
-    print 'match MAnorm peaks with motifscan result...'
+    print('match MAnorm peaks with motifscan result...')
     matched_manorm_pks = []
     matched_tarnum_list = []
     match_num = 0
@@ -250,22 +250,22 @@ def match_manorm_with_motifscan(pk_file, motifscan_result, neg_mvalue=False):
             if pk == mp:
                 match_num += 1
                 if match_num % 10000 == 0:
-                    print '@info:%d matched!' % match_num
+                    print('@info:%d matched!' % match_num)
                 matched_manorm_pks.append(pk)
                 matched_tarnum_list.append(mp.target_number)
                 # print mp.target_number
                 match = True
                 break
         if not match:
-            print '@warning:Not Match!\t',
+            print('@warning:Not Match!\t', end=' ')
             pk.prints()
-    print '@info:%d matched!' % match_num
+    print('@info:%d matched!' % match_num)
 
     tarnum_dict = {}
     for i, motif in enumerate(motifs):
         tarnum_dict[motif] = np.array([e[i] for e in matched_tarnum_list])
         # print tarnum_dict[motif]
-    print '\nend!'
+    print('\nend!')
 
     return matched_manorm_pks, tarnum_dict, motifs
 
@@ -288,9 +288,9 @@ def output_peaks_target_genes(pk_fp, refgene_fp):
         i += 1
         tar_genes += ref_genes.find_target_gene(pk)
         # print '\r%d / %d' % (i, len(pks))
-        os.write(1, '\r%d / %d' % (i, len(pks)))
+        sys.stdout.write('\r%d / %d' % (i, len(pks)))
         sys.stdout.flush()
-    print '\n'
+    print('\n')
     # save gene list
     fo = open(pk_fp.split(os.sep)[-1].split('.')[0] + '_targenes.txt', 'w')
     gene_names = set(gene.name2 for gene in tar_genes)
@@ -311,12 +311,12 @@ def classify_MAnorm_pks_by_promoter(pk_fp, refgene_fp):
     feature = FeaturePromoter(read_refgenes(refgene_fp))
     # make a classifier
     classifier = MAnormPeaksClassifier(pkset, feature)
-    print 'start to classify peaks by promoter zone ...'
+    print('start to classify peaks by promoter zone ...')
     classifier.classify_by_feature()
     promoter_pkset = classifier.feature_yes
-    print 'peak number in promoter: %d' % promoter_pkset.size
+    print('peak number in promoter: %d' % promoter_pkset.size)
     distal_pkset = classifier.feature_no
-    print 'peak number in distal: %d' % distal_pkset.size
+    print('peak number in distal: %d' % distal_pkset.size)
 
     # saving classified result
     header = '\t'.join(['#chr', 'start', 'end', 'summit', 'MAnorm_Mvalue', 'MAnorm_Avalue', 'pvalue\n'])
@@ -331,7 +331,7 @@ def classify_MAnorm_pks_by_promoter(pk_fp, refgene_fp):
     [file_distal.write(pk.tostring()) for pk in distal_pkset]
     file_distal.close()
 
-    print 'Done!'
+    print('Done!')
     return promoter_file_name, distal_file_name
 
 
@@ -350,7 +350,7 @@ def classify_MAnorm_peaks_by_motif(pks_fp, motifscan_fp, motif):
     # make a classifier
     classifier = MAnormPeaksClassifier(pkset, feature)
     classifier.classify_by_feature()
-    print 'there are %d mismatch!' % feature.mismatch
+    print('there are %d mismatch!' % feature.mismatch)
     motif_yes = classifier.feature_yes
     motif_no = classifier.feature_no
 
@@ -379,7 +379,7 @@ def classify_MAnorm_pks_by_pvalue(pk_fp, pvalue=0.001):
     feature = FeaturePvalue(pvalue)
     # make a classifier
     classifier = MAnormPeaksClassifier(pkset, feature)
-    print 'start to classify peaks ...'
+    print('start to classify peaks ...')
     classifier.classify_by_feature()
     promoter_pkset = classifier.feature_yes
     distal_pkset = classifier.feature_no
@@ -394,7 +394,7 @@ def classify_MAnorm_pks_by_pvalue(pk_fp, pvalue=0.001):
     [file_distal.write(pk.tostring()) for pk in distal_pkset]
 
     file_distal.close()
-    print 'Done!'
+    print('Done!')
 
 
 def other_pks_classified_pks_ttest(pk_fp, peaks_folder, correction_type='benjamin'):
@@ -418,7 +418,7 @@ def other_pks_classified_pks_ttest(pk_fp, peaks_folder, correction_type='benjami
         line += '%d\t%f\t%f\t' % (classifier.feature_yes.size, classifier.feature_yes.mean, classifier.feature_yes.std)
         line += '%d\t%f\t%f\t' % (classifier.feature_no.size, classifier.feature_no.mean, classifier.feature_no.std)
         lines.append(line)
-        print line
+        print(line)
         ttest = classifier.ttest_feature_classified_peaks()
         t_stat.append(ttest[0])
         ttest_pvalue.append(ttest[1])
@@ -439,7 +439,7 @@ def other_pks_classified_pks_ttest(pk_fp, peaks_folder, correction_type='benjami
     idx_sorted = np.array(max_pvalue).argsort().tolist()
     for i in idx_sorted:
         line = lines[i]
-        print line
+        print(line)
         if ttest_pvalue[i] is not None:
             line += str(t_stat[i]) + '\t' + str(ttest_pvalue[i]) + '\t' + str(corrected_ttest_pvalue[i]) + '\t'
             line += str(r_stat[i]) + '\t' + str(rtest_pvalue[i]) + '\t' + str(corrected_rtest_pvalue[i]) + '\t'
@@ -449,7 +449,7 @@ def other_pks_classified_pks_ttest(pk_fp, peaks_folder, correction_type='benjami
             # print line
         test_result.write(line)
 
-    print 'Done!'
+    print('Done!')
 
 
 def _get_header(correction_type):
@@ -527,7 +527,7 @@ def motif_classified_pks_ttest(pk_file_path, motifscan_result_path, negative=Fal
     idx_sorted = np.array(max_pvalue).argsort().tolist()
     for i in idx_sorted:
         line = lines[i]
-        print line
+        print(line)
         if ttest_pvalue[i] is not None:
             line += str(t_stat[i]) + '\t' + str(ttest_pvalue[i]) + '\t' + str(corrected_ttest_pvalue[i]) + '\t'
             line += str(r_stat[i]) + '\t' + str(rtest_pvalue[i]) + '\t' + str(corrected_rtest_pvalue[i]) + '\t'
@@ -539,24 +539,28 @@ def motif_classified_pks_ttest(pk_file_path, motifscan_result_path, negative=Fal
 
 
 def correct_pvalues(pvalues, correction_type='benjamin'):
-    sorted_indices = np.array(pvalues).argsort().tolist()
+    """Multiple-testing correction; None entries are left as None.
+
+    Ranking uses only non-None p-values so the routine works with modern NumPy,
+    which cannot argsort object arrays that mix float and None.
+    """
     corrected_pvalues = [None] * len(pvalues)
+    valid_indices = [i for i, p in enumerate(pvalues) if p is not None]
+    if not valid_indices:
+        return corrected_pvalues
+
+    n_tests = len(pvalues)
     if correction_type == 'benjamin':
-        for rank, i in enumerate(sorted_indices):
-            if pvalues[i] is None:
-                continue
-            corrected_pvalues[i] = len(pvalues) * pvalues[i] / (rank + 1)
-            if corrected_pvalues[i] > 1:
-                corrected_pvalues[i] = 1
+        ordered = sorted(valid_indices, key=lambda i: pvalues[i])
+        for rank, i in enumerate(ordered):
+            corrected = n_tests * pvalues[i] / (rank + 1)
+            corrected_pvalues[i] = 1 if corrected > 1 else corrected
     elif correction_type == 'bonferroni':
-        for rank, i in enumerate(sorted_indices):
-            if pvalues[i] is None:
-                continue
-            corrected_pvalues[i] = len(pvalues) * pvalues[i]
-            if corrected_pvalues[i] > 1:
-                corrected_pvalues[i] = 1
+        for i in valid_indices:
+            corrected = n_tests * pvalues[i]
+            corrected_pvalues[i] = 1 if corrected > 1 else corrected
     else:
-        corrected_pvalues = pvalues
+        corrected_pvalues = list(pvalues)
     return corrected_pvalues
 
 
@@ -587,11 +591,11 @@ if __name__ == '__main__':
     from constant import motifscan_file as ms
 
     import time
-    start = time.clock()
+    start = time.perf_counter()
     # test_classify_MAnorm_pks_by_promoter()
     # test_match_manorm_with_motifscan()
     test_motif_classified_pks_ttest()
     # test_read_motifscan_result()
 
-    print time.clock() - start
+    print(time.perf_counter() - start)
     pass

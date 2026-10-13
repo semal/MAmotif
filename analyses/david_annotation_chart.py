@@ -64,8 +64,8 @@ def calculate_motif_target_genes_enrich_terms(annotation_list, motif_peak_target
         all_genes += tm.genes
     background_genes = set(all_genes)
     motif_target_genes = read_motif_peaks_target_genes(motif_peak_target_genes_file).intersection(background_genes)
-    print \
-        '\t'.join(['term', 'overlap', 'motif_peak_target_genes', 'term_genes', 'background', 'enrich_score', 'pvalue'])
+    print(
+        '\t'.join(['term', 'overlap', 'motif_peak_target_genes', 'term_genes', 'background', 'enrich_score', 'pvalue']))
     for tm in annotated_list:
         term_genes = set(tm.genes)
         overlap_genes = term_genes.intersection(motif_target_genes)
@@ -77,9 +77,9 @@ def calculate_motif_target_genes_enrich_terms(annotation_list, motif_peak_target
         enrich_score = \
             1.0 * len(overlap_genes) / (1.0 * len(motif_target_genes) * len(term_genes) / len(background_genes))
         if pvalue <= 1:
-            print '%s\t%d\t%d\t%d\t%d\t%s\t%s' % \
+            print('%s\t%d\t%d\t%d\t%d\t%s\t%s' %
                   (tm.term, len(overlap_genes), len(motif_target_genes), len(term_genes),
-                   len(background_genes), str(enrich_score), str(pvalue))
+                   len(background_genes), str(enrich_score), str(pvalue)))
 
 
 if __name__ == '__main__':

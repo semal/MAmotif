@@ -2,8 +2,8 @@ import random
 
 from scipy import stats
 
-from sequence import Gene, Peak, PeakSet
-from MAmotifPeaks import MAnormPeakSet, MotifScanPeak
+from .sequence import Gene, Peak, PeakSet
+from .MAmotifPeaks import MAnormPeakSet, MotifScanPeak
 
 
 class Feature(object):
@@ -69,8 +69,8 @@ class FeaturePromoter(Feature):
             for gene in self.__group_genes[peak.chrm]:
                 if peak.is_overlap(gene.promoter_zone):
                     return True
-        except KeyError, e:
-            print e
+        except KeyError as e:
+            print(e)
             return False
         return False
 
@@ -223,8 +223,8 @@ class MAnormPeaksClassifier(Classifier):
                 pvalue_left = 1 - two_tailed_pvalue / 2
                 pvalue_right = two_tailed_pvalue / 2
             return float(t_statistic), pvalue_right
-        except:
-            return None
+        except Exception:
+            return None, None
 
     def ranksum_feature_classified_peaks(self):
         if not self._is_classified:
@@ -239,8 +239,8 @@ class MAnormPeaksClassifier(Classifier):
                 pvalue_left = 1 - two_side_pvalue / 2
                 pvalue_right = two_side_pvalue / 2
             return z_statistic, pvalue_right
-        except:
-            return None
+        except Exception:
+            return None, None
 
     def kstest_feature_classified_peaks(self):
         if not self._is_classified:
@@ -255,8 +255,8 @@ class MAnormPeaksClassifier(Classifier):
                 pvalue_left = 1 - two_side_pvalue / 2
                 pvalue_right = two_side_pvalue / 2
             return ks_statistic, pvalue_right
-        except:
-            return None
+        except Exception:
+            return None, None
 
 
 if __name__ == '__main__':

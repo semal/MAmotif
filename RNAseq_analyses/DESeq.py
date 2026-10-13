@@ -37,7 +37,7 @@ def run_DESeq(read_count_file1, read_count_file2):
     handle.close()
 
     # run R script
-    print 'Start running R script ...'
+    print('Start running R script ...')
     os.system('Rscript %s' % new_script_name)
     os.remove(new_script_name)
 
@@ -45,7 +45,7 @@ def run_DESeq(read_count_file1, read_count_file2):
 def get_sample_num(read_count_file):
     f = open(read_count_file)
     sample_num = len(f.readline().split('\t')) - 1
-    print sample_num
+    print(sample_num)
     f.close()
     return sample_num
 
@@ -73,7 +73,7 @@ def put_2together(file1, file2):
 
 if __name__ == '__main__':
     if '-h' in sys.argv:
-        print 'python DEseq.py treatment_read_count_file control_read_count_file'
+        print('python DEseq.py treatment_read_count_file control_read_count_file')
         exit(1)
     treatment = sys.argv[1]
     control = sys.argv[2]

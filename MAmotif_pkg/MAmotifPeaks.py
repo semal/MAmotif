@@ -1,5 +1,6 @@
 import numpy as np
-from sequence import Peak, Sequences, PeakSet
+
+from .sequence import Peak, Sequences, PeakSet
 
 
 class MAnormPeak(Peak):
@@ -26,21 +27,21 @@ class MAnormPeak(Peak):
         if self.__mvalue is not None:
             return self.__mvalue
         else:
-            print '@warning: the MAnorm mvalue is not exist!'
+            print('@warning: the MAnorm mvalue is not exist!')
 
     @property
     def avalue(self):
         if self.__avalue is not None:
             return self.__avalue
         else:
-            print '@warning: the MAnorm avalue is not exist!'
+            print('@warning: the MAnorm avalue is not exist!')
 
     @property
     def pvalue(self):
         if self.__pvalue is not None:
             return self.__pvalue
         else:
-            print '@warning: the MAnorm pvalue is not exist!'
+            print('@warning: the MAnorm pvalue is not exist!')
 
     def is_in_gene(self, gene):
         """
@@ -57,9 +58,9 @@ class MAnormPeak(Peak):
 
     def prints(self):
         """
-        print sequence
+        print(sequence)
         """
-        print '\t'.join(
+        print('\t'.join()
             [self.chrm, str(self.start), str(self.end), str(self.mvalue), str(self.avalue), str(self.pvalue)]
         )
 
@@ -148,14 +149,14 @@ class MotifScanPeak(Peak):
         if self.__target_number is not None:
             return self.__target_number
         else:
-            print '@error: the target number is not exist!'
+            print('@error: the target number is not exist!')
 
     def prints(self):
         """
-        print sequence
+        print(sequence)
         """
         if self.target_number is not None and isinstance(self.target_number, int):
-            print '\t'.join([self.chrm, str(self.start), str(self.end), str(self.target_number)])
+            print('\t'.join([self.chrm, str(self.start), str(self.end), str(self.target_number)]))
         else:
             Peak.prints(self)
 

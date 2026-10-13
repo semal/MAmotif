@@ -69,7 +69,7 @@ def run_macs(treatment_fp, control_fp, name):
     os.chdir(name)
     xls_peak_fn = '_'.join([name, 'peaks.xls'])
     if os.path.exists(xls_peak_fn):
-        print '@MACS result already exist.'
+        print('@MACS result already exist.')
         return os.path.abspath(xls_peak_fn)
     subprocess.check_output(cmd, shell=True)
     save_log(cmd, '%s_macs_cmd.log' % name)
@@ -95,7 +95,7 @@ def cut_macs_peaks(treatment_fp, control_fp, name):
               '-s %s ' % no_cut_peak_fn + \
               '-n %s ' % cut_top.replace('_Top', '').replace('K', '') + \
               '-t .'
-        print '@cutting peaks ...'
+        print('@cutting peaks ...')
         os.system(cmd)
         return os.path.abspath(cut_peak_fn)
     elif cut_p:
@@ -110,7 +110,7 @@ def cut_macs_peaks(treatment_fp, control_fp, name):
         cmd = 'python %s ' % cut_p_peaks_cmd_fp + \
               '-p %s ' % no_cut_peak_fn + \
               '-v %s' % cut_p.replace('_P', '')
-        print '@cutting peaks ...'
+        print('@cutting peaks ...')
         os.system(cmd)
         return os.path.abspath(cut_peak_fn)
 
@@ -132,16 +132,16 @@ def run_manorm(xls_peak_fp1, read_fp1, xls_peak_fp2, read_fp2, comparison_name):
         # print manorm_pk_fp1
         manorm_pk_fp2 = os.path.abspath(os.path.basename(xls_peak_fp2).replace('.xls', '_MAvalues.xls'))
         if os.path.exists(manorm_pk_fp1) and os.path.exists(manorm_pk_fp2):
-            print '@MAnorm result already exist.'
+            print('@MAnorm result already exist.')
             return manorm_pk_fp1, manorm_pk_fp2
     except:
         subprocess.call(cmd, shell=True)
         save_log(cmd, '%s_MAnorm_cmd.log' % comparison_name)
         os.chdir(comparison_name)
         manorm_pk_fp1 = os.path.abspath(os.path.basename(xls_peak_fp1).replace('.xls', '_MAvalues.xls'))
-        print manorm_pk_fp1
+        print(manorm_pk_fp1)
         manorm_pk_fp2 = os.path.abspath(os.path.basename(xls_peak_fp2).replace('.xls', '_MAvalues.xls'))
-        print manorm_pk_fp2
+        print(manorm_pk_fp2)
         return manorm_pk_fp1, manorm_pk_fp2
 
 
@@ -164,39 +164,47 @@ def run_motifscan(macs_xls_fp):
     motifscan_pkl_fp = \
         'motifscan_output_' + os.path.basename(macs_xls_fp).replace('.xls', '') + '/peak_result.pkl'
     if os.path.exists(motifscan_pkl_fp):
-        print '@MotifScan pkl file already exist.'
+        print('@MotifScan pkl file already exist.')
         return os.path.abspath(motifscan_pkl_fp)
     os.system(cmd)
-    print cmd
+    print(cmd)
     save_log(cmd, macs_xls_fp.replace('.xls', '_motifscan_cmd.log'))
     return os.path.abspath(motifscan_pkl_fp)
 
 
 def run_mamotif_pipeline(treatment_fp1, control_fp1, name1, treatment_fp2, control_fp2, name2, comparison_name):
-    print '#1 running MACS ...'
+    print('#1 running MACS ...')
     # macs_xls_peak_fp1 = run_macs(treatment_fp1, control_fp1, name1)
     # macs_xls_peak_fp2 = run_macs(treatment_fp2, control_fp2, name2)
-    macs_xls_peak_fp1, macs_xls_peak_fp2 = \
-        map(cut_macs_peaks, [treatment_fp1, treatment_fp2], [control_fp1, control_fp2], [name1, name2])
-    print macs_xls_peak_fp1
-    print macs_xls_peak_fp2
-    print '#2 running MAnorm ...'
+    macs_xls_peak_fp1, macs_xls_peak_fp2 = [
+        cut_macs_peaks(t, c, n)
+        for t, c, n in zip(
+            [treatment_fp1, treatment_fp2],
+            [control_fp1, control_fp2],
+            [name1, name2],
+        )
+    ]
+    print(macs_xls_peak_fp1)
+    print(macs_xls_peak_fp2)
+    print('#2 running MAnorm ...')
     manorm_pk_fp1, manorm_pk_fp2 = \
         run_manorm(macs_xls_peak_fp1, treatment_fp1, macs_xls_peak_fp2, treatment_fp2, comparison_name)
-    print '#3 running MotifScan ...'
+    print('#3 running MotifScan ...')
     # motifscan_pkl_fp1 = run_motifscan(macs_xls_peak_fp1)
     # motifscan_pkl_fp2 = run_motifscan(macs_xls_peak_fp2)
-    motifscan_pkl_fp1, motifscan_pkl_fp2 = map(run_motifscan, [macs_xls_peak_fp1, macs_xls_peak_fp2])
+    motifscan_pkl_fp1, motifscan_pkl_fp2 = [
+        run_motifscan(fp) for fp in (macs_xls_peak_fp1, macs_xls_peak_fp2)
+    ]
     time.sleep(2)
-    print '#4 running MAmotif ...'
+    print('#4 running MAmotif ...')
     os.chdir(working_fd)
     os.chdir(mamotif_fd)
-    cmd1 = 'python %s ' % mamotif_cmd_fp + \
+    cmd1 = 'python3 %s ' % mamotif_cmd_fp + \
            '-p %s ' % manorm_pk_fp1 + \
            '-M %s ' % motifscan_pkl_fp1 + \
            '-r %s' % hg19
     os.system(cmd1)
-    cmd2 = 'python %s ' % mamotif_cmd_fp + \
+    cmd2 = 'python3 %s ' % mamotif_cmd_fp + \
            '-p %s ' % manorm_pk_fp2 + \
            '-M %s ' % motifscan_pkl_fp2 + \
            '-r %s ' % hg19 + '-n'
@@ -222,7 +230,7 @@ def test_run_mamotif_pipeline():
 
 def cmd():
     if not os.path.exists(macs_fd):
-        yn = raw_input('Current working directory do not exist requisite folders, '
+        yn = input('Current working directory do not exist requisite folders, '
                        'do you want to create them?(yes or no)')
         if yn == 'yes':
             generate_working_folders()

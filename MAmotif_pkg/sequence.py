@@ -68,16 +68,16 @@ class Sequence(object):
         """
         @return: midpoint of sequence
         """
-        return (self.__end + self.__start) / 2
+        return (self.__end + self.__start) // 2
 
     def prints(self):
         """
-        print sequence
+        print(sequence)
         """
         if self.__strand is None:
-            print '\t'.join([self.chrm, str(self.start), str(self.end)])
+            print('\t'.join([self.chrm, str(self.start), str(self.end)]))
         else:
-            print '\t'.join([self.chrm, str(self.start), str(self.end), self.strand])
+            print('\t'.join([self.chrm, str(self.start), str(self.end), self.strand]))
 
     def __eq__(self, other):
         """
@@ -137,9 +137,9 @@ class Gene(Sequence):
 
     def prints(self):
         if self.strand is None:
-            print '\t'.join([self.name, self.__chrm, str(self.__start), str(self.__end)])
+            print('\t'.join([self.name, self.__chrm, str(self.__start), str(self.__end)]))
         else:
-            print '\t'.join([self.name, self.__chrm, str(self.__start), str(self.__end), self.strand])
+            print('\t'.join([self.name, self.__chrm, str(self.__start), str(self.__end), self.strand]))
 
 
 class Tag(Sequence):
@@ -194,7 +194,7 @@ class Peak(Sequence):
         if self.chrm == gene.chrm:
             return abs(self.summit - gene.tss)
         else:
-            print '@warning: %s is not the same chromosome with this peak!' % gene.name
+            print('@warning: %s is not the same chromosome with this peak!' % gene.name)
 
     def prints(self):
         if self.summit is not None:
@@ -310,7 +310,7 @@ class Sequences(object):
                 grp[seq.strand].append(seq)
             return grp
         else:
-            print 'the sequence do not have information of strand!'
+            print('the sequence do not have information of strand!')
 
     @property
     def size(self):
@@ -360,7 +360,7 @@ class GeneSet(Sequences):
             if name.lower() == gene.name.lower():
                 gene.prints()
                 return gene
-        print 'Can not find %s' % name
+        print('Can not find %s' % name)
 
     def find_target_gene(self, peak, is_nearest=False):
         if not self.__is_grouped:
@@ -370,7 +370,7 @@ class GeneSet(Sequences):
         try:
             genes_chr = self.__group[peak.chrm]
         except:
-            print 'This peak do not have target gene in this gene set!'
+            print('This peak do not have target gene in this gene set!')
             return []
 
         if is_nearest:

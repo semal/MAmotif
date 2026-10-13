@@ -4,6 +4,8 @@
 # 观察到的结果就应该是有显著的差异（p值很小）
 from optparse import OptionParser
 import os
+import sys
+
 import numpy
 from MAmotif_pkg import *
 from jaspar3 import jaspar3_name, read_motifscan_result
@@ -15,20 +17,20 @@ def get_jaspar3_target_number_list(pk_file, motifscan_result, motifs=jaspar3_nam
     """
     # read MAnorm peaks
     if isinstance(pk_file, str):
-        print 'read %s' % pk_file
+        print('read %s' % pk_file)
         pk_list = read_MAnorm_peaks(pk_file, neg)
     else:
         pk_list = pk_file
 
     # read motifscan result
     if isinstance(motifscan_result, list):
-        print 'read %s' % motifscan_result
+        print('read %s' % motifscan_result)
         motifscan_pks = motifscan_result
     else:
         motifscan_pks = read_motifscan_result(motifscan_result, motifs)
 
     # matching ...
-    print 'match MAnorm peaks with motifscan result...'
+    print('match MAnorm peaks with motifscan result...')
     tarnum_list = []  # get target number list of matched pks
     match_num = 0
     pk_num = len(pk_list)
@@ -37,18 +39,18 @@ def get_jaspar3_target_number_list(pk_file, motifscan_result, motifs=jaspar3_nam
         for mp in motifscan_pks:
             if pk == mp:
                 match_num += 1
-                os.write(1, '\r%d/%d' % (match_num, pk_num))
+                sys.stdout.write('\r%d/%d' % (match_num, pk_num))
                 tarnum_list.append(mp.target_number)
                 match = True
                 break
         if not match:
             tarnum_list.append(None)
-            print 'Not Match!'
+            print('Not Match!')
             pk.prints()
 
     pk_list = [pk for pk, tarnum in zip(pk_list, tarnum_list) if tarnum is not None]
     tarnum_list = [tarnum for tarnum in tarnum_list if tarnum is not None]
-    print '\nend!'
+    print('\nend!')
     return pk_list, tarnum_list
 
 
@@ -131,7 +133,7 @@ def output_jaspar3_motifs_test_result(
     idx_sorted = np.array(max_pvalue).argsort().tolist()
     for i in idx_sorted:
         line = lines[i]
-        print line
+        print(line)
         if ttest_pvalue[i] is not None:
             line += str(t_stat[i]) + '\t' + str(ttest_pvalue[i]) + '\t' + str(corrected_ttest_pvalue[i]) + '\t'
             line += str(r_stat[i]) + '\t' + str(rtest_pvalue[i]) + '\t' + str(corrected_rtest_pvalue[i]) + '\t'
@@ -177,7 +179,7 @@ if __name__ == '__main__':
     pk = options.pk
     motif = options.motif
     negative = options.negative
-    print negative
+    print(negative)
     correction = options.correction
     output_jaspar3_motifs_test_result(pk, motif, jaspar3_name, negative=negative, correction_type=correction)
 

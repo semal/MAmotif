@@ -25,12 +25,12 @@ def get_DEgenes_from_DEseq_result(deseq_file, limit_pvalue, more_or_less='>', va
                     elif more_or_less == '<':
                         if float(cnt[-3]) < value:
                             log2_fcs[cnt[1].replace('"', '')] = float(cnt[-3])
-        except ValueError, e:
-            print e
+        except ValueError as e:
+            print(e)
             continue
     fi.close()
     filename = os.path.split(deseq_file)[1]
-    print 'get %d genes in %s!' % (len(log2_fcs.keys()), filename)
+    print('get %d genes in %s!' % (len(log2_fcs.keys()), filename))
     # 输出差异表达基因，每一行是一个gene symbol
     file_name = filename.replace('.txt', 'log2FC_%s_p%s_genes.txt' % (str(value), str(limit_pvalue)))
     file_name = file_name.replace('read_count_', '').replace('output', '')

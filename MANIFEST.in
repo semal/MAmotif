@@ -1,0 +1,10 @@
+include README.md
+include requirements.txt
+include LICENSE
+recursive-include data *
+recursive-include docs *
+recursive-include command_tools *
+recursive-include analyses *
+recursive-include RNAseq_analyses *
+recursive-include tests *
+global-exclude __pycache__ *.py[cod]

@@ -1,6 +1,6 @@
 # coding=utf-8
 # 富集分析相关
-from scipy.stats.stats import fisher_exact
+from scipy.stats import fisher_exact
 import os
 from MAmotif_pkg import *
 from gene_set_analysis import make_2geneset_fisher_exact_test, get_fisher_table, cal_enrich_score
@@ -20,7 +20,7 @@ def get_motifs_target_genes(bkg_peak_file, motifscan_result, refgene_file, is_ne
     gene_list = read_refgenes(refgene_file)
     gene_set = GeneSet()
     gene_set.set_sequences(gene_list)
-    print 'get peaks target genes...'
+    print('get peaks target genes...')
     target_genes_list = [gene_set.find_target_gene(pk, is_nearest) for pk in pk_list]
 
     all_bk_genes = []
@@ -61,7 +61,7 @@ def motif_targenes_de_fisher_test(manorm_pk_fp, motifscan_fp, de_genes_fp, refge
             '\t'.join(['motif', 'bkg genes', 'motif targenes', 'de genes', 'overlap genes', 'enrich score', 'p-value'])
         fo.write(header + '\n')
         for motif in motifs_genes.keys():
-            print '%s\t' % motif,
+            print('%s\t' % motif, end=' ')
             out_string = motif + '\t' + make_2geneset_fisher_exact_test(bkg_gene_set, motifs_genes[motif], de_gene_set)
             fo.write(out_string + '\n')
         fo.close()
@@ -74,7 +74,7 @@ def motif_targenes_de_fisher_test(manorm_pk_fp, motifscan_fp, de_genes_fp, refge
                 get_1de_gene_list(fp)
             except:
                 continue
-    print '\n'
+    print('\n')
 
 
 def do_peak_target_genes_overlap_fisher_test(manorm_pk_fp, motifscan_fp, refgene_fp, host_motif):
@@ -88,14 +88,14 @@ def do_peak_target_genes_overlap_fisher_test(manorm_pk_fp, motifscan_fp, refgene
     bkg_gene_set, motifs_genes = get_motifs_target_genes(manorm_pk_fp, motifscan_fp, refgene_fp)
 
     def do_1host_motif(hm):
-        print 'host motif %s targenes fisher test:' % hm
+        print('host motif %s targenes fisher test:' % hm)
         if hm not in motifs_genes.keys():
-            print '@warning: %s not exist!' % hm
+            print('@warning: %s not exist!' % hm)
             exit(0)
 
         host_gene_set = motifs_genes[hm]
         for motif in motifs_genes.keys():
-            print '%s\t' % motif,
+            print('%s\t' % motif, end=' ')
             make_2geneset_fisher_exact_test(bkg_gene_set, motifs_genes[motif], host_gene_set)
 
     if isinstance(host_motif, list):
@@ -116,7 +116,7 @@ def do_2motif_peaks_overlap_fisher_test(pk_fp, host_motif, motifscan_fp):
     bkg_pks_len = len(pks)
 
     def do_1host_motif(hm):
-        print 'motif %s peaks fisher test:' % hm
+        print('motif %s peaks fisher test:' % hm)
         host_tarnum = tarnum_dict[hm]
         host_pk_len = __cal_length_over_zero(host_tarnum)
         # other motif
@@ -128,8 +128,8 @@ def do_2motif_peaks_overlap_fisher_test(pk_fp, host_motif, motifscan_fp):
             table = get_fisher_table(bkg_pks_len, host_pk_len, other_pks_len, overlap_pks_len)
             res = fisher_exact(table, alternative='greater')
             enrich_score = cal_enrich_score(bkg_pks_len, host_pk_len, other_pks_len, overlap_pks_len)
-            print '%s\t%d\t%d\t%d\t%d\t%.3f\t%s' % \
-                  (moti, bkg_pks_len, host_pk_len, other_pks_len, overlap_pks_len, enrich_score, str(res[1]))
+            print('%s\t%d\t%d\t%d\t%d\t%.3f\t%s' %
+                  (moti, bkg_pks_len, host_pk_len, other_pks_len, overlap_pks_len, enrich_score, str(res[1])))
 
     if isinstance(host_motif, str):
         do_1host_motif(host_motif)

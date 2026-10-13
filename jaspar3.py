@@ -208,14 +208,14 @@ jaspar3_name = ['SOX10',  # 一共有196个motif
 # 果，这样可以只做一次匹配（匹配MAnorm peaks和Motifscan的结果）而将所有peaks按照有没有某个motif进行分类。
 def read_motifscan_result(motifscan_result, motifs=jaspar3_name):
     # read motifscan result from Wangjiawei's peak result file
-    print 'reading motifscan result, start!'
+    print('reading motifscan result, start!')
     motifscan = pandas.read_pickle(motifscan_result)  # from Wang Jiawei MotifScan result
     motifscan_peak_list = []
     i = 0
     row_num = motifscan.shape[0]
     for k, v in motifscan.iterrows():
         i += 1
-        os.write(1, '\r%d/%d' % (i, row_num))
+        sys.stdout.write('\r%d/%d' % (i, row_num))
         motifscan_peak = MotifScanPeak(v['chr'], int(v['start']), int(v['end']), int(v['summit']))
         target_number_list = []
         for name in motifs:
@@ -224,9 +224,9 @@ def read_motifscan_result(motifscan_result, motifs=jaspar3_name):
                 # print name
             except:
                 target_number_list.append(None)  # using None for assigning the existence of motif
-                print '%s not exist in the motifscan result!' % name
+                print('%s not exist in the motifscan result!' % name)
         motifscan_peak.set_motif_info(motifs, target_number_list)
         motifscan_peak_list.append(motifscan_peak)
         sys.stdout.flush()
-    print '\nend!'
+    print('\nend!')
     return motifscan_peak_list

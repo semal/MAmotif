@@ -1,30 +1,18 @@
+#!/usr/bin/env python3
 # coding=utf-8
-# 这个脚本用来输出给定peaks的靶基因
-from import_MAmotif import *
+"""Output target genes for a peak file given a RefGene annotation."""
+import argparse
+
+from import_MAmotif import output_peaks_target_genes
 
 
-def get_target_genes(pk_folder, refgene_fp):
-    for fn in os.listdir(pk_folder):
-        fp = os.sep.join([pk_folder, fn])
-        output_peaks_target_genes(fp, refgene_fp)
-
-
-def test():
-    os.chdir('F:\\MAmotif.py\\7. primed_naive_hESC\\primed_hESC_H3K4me3_genes')
-    refgene_fp = 'F:\\MAmotif_src\\data\modified_hg19_refgene.txt'
-    get_target_genes('peaks', refgene_fp)
-
-
-def command():
-    # ----------command-----------------------------
-    if '-h' in sys.argv:
-        print 'python get_target_genes.py pk refgene'
-        exit(1)
-    pk1 = sys.argv[1]
-    ref = sys.argv[2]
-    output_peaks_target_genes(pk1, ref)
+def command(argv=None):
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('pk', help='peak file path')
+    parser.add_argument('refgene', help='refgene annotation file')
+    options = parser.parse_args(argv)
+    output_peaks_target_genes(options.pk, options.refgene)
 
 
 if __name__ == '__main__':
-    # command()
-    test()
+    command()

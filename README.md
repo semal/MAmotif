@@ -19,7 +19,7 @@ MAmotif 将 [MAnorm](https://github.com/shao-lab/MAnorm) 定量比较得到的�
 
 ## 依赖环境
 
-本仓库代码使用 **Python 2** 语法编写（例如 `print` 语句、`xrange`、`except Exception, e`），建议在 Python 2.7 下运行。
+需要 **Python 3.8+**（已从 Python 2 迁移）。
 
 Python 依赖：
 
@@ -32,7 +32,13 @@ RNA-seq 差异表达分析额外需要 R 与 DESeq。
 
 Motif 扫描结果来自 MotifScan（支持 pandas pickle 结果，以及 MATLAB `.mat` 格式）。
 
-将仓库根目录加入 `PYTHONPATH` 后即可调用包内模块：
+推荐用可编辑安装：
+
+```bash
+pip install -e ".[dev]"
+```
+
+或将仓库根目录加入 `PYTHONPATH`：
 
 ```bash
 export PYTHONPATH=/path/to/MAmotif:$PYTHONPATH
@@ -75,7 +81,15 @@ MAnorm peak 文件  +  MotifScan 结果  +  RefGene 注释
 3. 默认在与 MAnorm 比较同名的输出目录中写出结果
 
 ```bash
-python MAmotif.py \
+# 安装后可用控制台命令
+mamotif \
+    -p path/to/sample_peak_MAvalues.xls \
+    -M path/to/motifscan_peak_result \
+    -r data/modified_hg19_refgene.txt \
+    -c benjamin
+
+# 或直接运行脚本
+python3 MAmotif.py \
     -p path/to/sample_peak_MAvalues.xls \
     -M path/to/motifscan_peak_result \
     -r data/modified_hg19_refgene.txt \
@@ -165,25 +179,25 @@ DEFA5	0.020756	0.009441	2.198577	1.136570
 
 ```bash
 # 按启动子分类
-python command_tools/classify_pks_by_promoter.py \
+python3 command_tools/classify_pks_by_promoter.py \
     -p path/to/peaks_MAvalues.xls \
     -r data/modified_hg19_refgene.txt
 
 # 按单个 motif 分类
-python command_tools/classify_pks_by_motif.py \
+python3 command_tools/classify_pks_by_motif.py \
     -p path/to/peaks_MAvalues.xls \
     -M path/to/motifscan_result \
     -n SOX2
 
 # motif 靶基因 vs 差异表达基因的 Fisher 检验
-python command_tools/motif_targenes_de_fisher_test.py \
+python3 command_tools/motif_targenes_de_fisher_test.py \
     -p path/to/peaks_MAvalues.xls \
     -M path/to/motifscan_result \
     -r data/modified_hg19_refgene.txt \
     -d data/K562_H1hesc_DEseq_DE_FC_2_p1e-07_genes.txt
 
 # M 值与基因表达变化的相关
-python command_tools/assoicate_Mvalue_GE.py \
+python3 command_tools/assoicate_Mvalue_GE.py \
     -p path/to/peaks_MAvalues.xls \
     -r data/modified_hg19_refgene.txt \
     -f data/H1hesc_K562_genes_fold_change.txt
@@ -228,4 +242,5 @@ MAmotif/
 
 - 上游定量比较依赖 MAnorm；motif 扫描依赖 MotifScan。本仓库完成匹配、分类与统计检验。
 - `data/` 中的示例以 H1 hESC vs K562 的 H3K27ac 比较为主。
-- 更完整的模块说明见仓库中的 `项目总结报告.md`。
+- 更完整的模块说明见 `docs/项目总结报告.md`。
+- 开发自检：`pytest`（见 `tests/`）。

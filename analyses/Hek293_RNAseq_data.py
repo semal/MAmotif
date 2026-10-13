@@ -25,7 +25,7 @@ def extract_res():
                 continue
             fp = os.sep.join([fd_name, fn])
             line = get_specific_line(fp)
-            print fp, ':', line,
+            print(fp, ':', line, end=' ')
 
 
 # 将抽取的结果按照distal,promoter,both分开
@@ -52,7 +52,7 @@ def process_res():
     with open('H3K4me3_Hek293_ZNF263_MAmotif_promoter.txt') as fi:
         for line in fi:
             cnt = line.split('\t')
-            print cnt[0].replace('H3K4me3_Hek293_UW_', ''), '\t',cnt[-1],
+            print(cnt[0].replace('H3K4me3_Hek293_UW_', ''), '\t',cnt[-1], end=' ')
 
 
 # 作图表
@@ -96,7 +96,7 @@ def show_res():
     ax.plot([3, 3], [0, 2 * len(values)], '--', color='r')
     ax.text(3, 0.5, '3')
     # ax.show()
-    # fig_name = raw_input('Name this figure!\n')
+    # fig_name = input('Name this figure!\n')
     # plt.savefig(fig_name)
 
     names, values = get_info('4motif_MAmotif.txt', 'distal')
@@ -117,7 +117,7 @@ def show_res():
     ax.plot([3, 3], [0, 2 * len(values)], '--', color='r')
     ax.text(3, 0.5, '3')
     plt.show()
-    # fig_name = raw_input('Name this figure!\n')
+    # fig_name = input('Name this figure!\n')
     # ax.savefig(fig_name)
     # plt.savefig('H1hESC_ZNF263.png')
 
@@ -151,7 +151,7 @@ def scan_and_calculate(M_gene_pairs, DE_genes, **kwargs):
     step = kwargs.pop('step', 1)
 
     enrich_score = []
-    for i in xrange(0, len(M) - window, step):
+    for i in range(0, len(M) - window, step):
         window_genes = genes[i: i + window]
         es = make_2geneset_fisher_exact_test(background_genes, set(window_genes), set(DE_genes))
         enrich_score.append(es)

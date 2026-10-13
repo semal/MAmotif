@@ -59,12 +59,12 @@ def temp2():
     bk_peaks_set = MAnormPeakSet()
     bk_peaks_set.set_sequences(bk_peaks)
     group_bk_peaks = bk_peaks_set.group_by_chromosomes()
-    print '背景组peaks的数目是：%d' % bk_peaks_set.size
+    print('背景组peaks的数目是：%d' % bk_peaks_set.size)
 
     tf_peaks_folder = os.sep.join(['key_peaks', 'mouse_TF_peaks'])
     tf_overlap_flags = {}
     for tf_file in os.listdir(tf_peaks_folder):
-        print 'calculate %s ...' % tf_file
+        print('calculate %s ...' % tf_file)
         tf_overlap_flags[tf_file] = []
         tf_file_path = os.sep.join([tf_peaks_folder, tf_file])
         tf_peaks = read_MAnorm_peaks(tf_file_path)
@@ -120,8 +120,8 @@ def temp3():
     m21 = len(znf263_gene_set) - len(znf263_overlap)
     m22 = len(background_gene_set) - len(background_overlap) - m21
     table = [[m11, m12], [m21, m22]]
-    print table
-    print fisher_exact(table, alternative='greater')
+    print(table)
+    print(fisher_exact(table, alternative='greater'))
 
 
 def temp4():
@@ -149,7 +149,7 @@ def temp4():
     znf263_len = len(znf263_genes)
     ol_len = len(overlap)
     table = [[ol_len, de_len - ol_len], [znf263_len - ol_len, bk_len - de_len - znf263_len + ol_len]]
-    print fisher_exact(table, alternative='greater')
+    print(fisher_exact(table, alternative='greater'))
     pass
 
 
@@ -184,15 +184,15 @@ def temp6():
         fp = os.sep.join([fd, fn])
         sets[fn] = read_list(fp)
     keys = sets.keys()
-    print '\t'.join([''] + keys)
+    print('\t'.join([''] + keys))
     common = sets[keys[0]]
     for ko in keys:
         common = common.intersection(sets[ko])
-        print '%s(%d)' % (ko, len(sets[ko])),
+        print('%s(%d)' % (ko, len(sets[ko])), end=' ')
         for ki in keys:
-            print '\t%d' % len(sets[ki].intersection(sets[ko])),
-        print '\n',
-    print 'common genes size: %d(%s)' % (len(common), str(common))
+            print('\t%d' % len(sets[ki].intersection(sets[ko])), end=' ')
+        print('\n', end=' ')
+    print('common genes size: %d(%s)' % (len(common), str(common)))
 
 
 def temp7():
@@ -200,11 +200,11 @@ def temp7():
          'renormalized_MIT_WIBR2_hESC_primed_vs_naive_fc.txt'
     with open(fp) as fi:
         header = fi.readline()
-        print header
+        print(header)
         for line in fi:
             cnt = line.strip().split('\t')
             if float(cnt[0]) > 50 and float(cnt[1]) < -2:
-                print '\t'.join([cnt[3], cnt[2]])
+                print('\t'.join([cnt[3], cnt[2]]))
 
 
 def temp8():
@@ -231,7 +231,7 @@ def temp8():
                 de_genes += gene_symbols
     de_genes = set(de_genes)
     for gene in de_genes:
-        print gene
+        print(gene)
 
 
 def temp9():
@@ -266,7 +266,7 @@ def temp10():
     for gene in refgenes:
         i += 1
         if i % 1000 == 0:
-            print i
+            print(i)
         m1 = m1_pks.find_target_pks(gene)
         m2 = m2_pks.find_target_pks(gene)
         if m1 == [] or m2 == []:
@@ -286,7 +286,7 @@ def temp10():
 
 def temp11():
     header = 'name\tmotif\tbkg genes\tmotif targenes\tde genes\toverlap genes\tenrich score\tp-value'
-    print header
+    print(header)
     motifs = ['MZF1_5-13', 'Pou5f1', 'Sox2']
     os.chdir('F:\MAmotif\8. jaspar_motifs_targenes_DE_fisher_test\Esb4_DE_genes_fisher_test')
     for motif in motifs:
@@ -294,7 +294,7 @@ def temp11():
             with open(os.sep.join(['Esb4_promoter', fn])) as fi:
                 for line in fi:
                     if motif in line:
-                        print '%s\t%s' % (fn, line.strip())
+                        print('%s\t%s' % (fn, line.strip()))
 
 
 def download_38_tf_peaks():
@@ -305,7 +305,7 @@ def download_38_tf_peaks():
         second_fd = ''.join([gsm_prefix, str(suffix)])  # 二级目录名
         download_fp = '/'.join([first_fp, second_fd, 'suppl', '*.peak.txt.gz'])  # 下载路径
         cmd = 'wget -c %s' % download_fp  # 下载命令
-        print cmd
+        print(cmd)
 
 if __name__ == '__main__':
     # temp11()
